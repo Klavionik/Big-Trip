@@ -19,4 +19,4 @@ const createFiltersTemplate = () => {
           </form>`;
 };
 
-export { createFiltersTemplate };
+export {createFiltersTemplate};

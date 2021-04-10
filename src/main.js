@@ -4,21 +4,25 @@ import {
   createFiltersTemplate,
   createSortingTemplate,
   createEventItemTemplate,
-  createEventEditFormTemplate,
-  createEventNewFormTemplate
+  createEventEditFormTemplate
 } from './view';
+import {generateEventItem, generateAvailableOffers} from './mock/event-item';
+import {calculateTripInfo} from './utils/trip-info';
 
-const EVENT_ITEMS_COUNT = 3;
+const EVENT_ITEMS_COUNT = 8;
+
+const availableOffers = generateAvailableOffers();
+const eventItems = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);
 
 const render = (container, template, position = 'beforeend') => {
   container.insertAdjacentHTML(position, template);
 };
 
 const createEvents = (eventsList) => {
-  for (let i = 0; i < EVENT_ITEMS_COUNT; i++) {
-    const eventItem = createEventItemTemplate();
+  eventItems.slice(1).forEach((event) => {
+    const eventItem = createEventItemTemplate(event);
     render(eventsList, eventItem);
-  }
+  });
 };
 
 const navigationElement = document.querySelector('.trip-controls__navigation');
@@ -27,13 +31,15 @@ const filtersElement = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 
 render(navigationElement, createMenuTemplate());
-render(tripMainElement, createTripInfoTemplate(), 'afterbegin');
+
+const tripInfo = calculateTripInfo(eventItems.slice(1));
+render(tripMainElement, createTripInfoTemplate(tripInfo), 'afterbegin');
 render(filtersElement, createFiltersTemplate());
 render(tripEventsElement, createSortingTemplate());
 
 const tripEventsListElement = document.querySelector('.trip-events__list');
 
-render(tripEventsListElement, createEventEditFormTemplate());
+render(tripEventsListElement, createEventEditFormTemplate(eventItems[0], availableOffers));
 createEvents(tripEventsListElement);
-render(tripEventsListElement, createEventNewFormTemplate());
+// render(tripEventsListElement, createEventNewFormTemplate(eventItems[0]), availableOffers);
 

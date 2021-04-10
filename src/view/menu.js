@@ -5,4 +5,4 @@ const createMenuTemplate = () => {
           </nav>`;
 };
 
-export { createMenuTemplate };
+export {createMenuTemplate};
