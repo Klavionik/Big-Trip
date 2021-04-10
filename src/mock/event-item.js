@@ -20,7 +20,7 @@ const LOREM = [
   'Fusce tristique felis at fermentum pharetra.',
   'Aliquam id orci ut lectus varius viverra.',
   'Nullam nunc ex, convallis sed finibus eget, sollicitudin eget ante.',
-].join(' ');
+];
 
 
 const getRandomOffers = (offersCount) => {
@@ -43,11 +43,16 @@ const getRandomPhotos = (photosCount) => {
   return new Array(photosCount).fill().map(() => createPhotoLink(getRandomInteger(0, 100)));
 };
 
+const getRandomText = (textLength) => {
+  return new Array(textLength).fill().map(() => getRandomElement(LOREM)).join(' ');
+
+};
+
 const getRandomDescription = () => {
   const generateDescription = getRandomBool();
   return generateDescription
     ? {
-      text: LOREM,
+      text: getRandomText(getRandomInteger(1, 5)),
       photos: getRandomPhotos(getRandomInteger(0, 5)),
     }
     : null;
