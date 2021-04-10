@@ -1,4 +1,4 @@
-import {processEventDate} from './utils';
+import {processEventDate} from '../utils/dates';
 
 const createOffersTemplate = (offers) => {
   const createOffers = () => {

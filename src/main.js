@@ -6,9 +6,8 @@ import {
   createEventItemTemplate,
   createEventEditFormTemplate
 } from './view';
-import {generateEventItem} from './mock/event-item';
-import {calculateTripInfo} from './view/utils';
-import {generateAvailableOffers} from './mock/utils';
+import {generateEventItem, generateAvailableOffers} from './mock/event-item';
+import {calculateTripInfo} from './utils/trip-info';
 
 const EVENT_ITEMS_COUNT = 8;
 
@@ -42,6 +41,5 @@ const tripEventsListElement = document.querySelector('.trip-events__list');
 
 render(tripEventsListElement, createEventEditFormTemplate(eventItems[0], availableOffers));
 createEvents(tripEventsListElement);
-// по условию задачи рендерить форму новой точки маршрута не нужно?
 // render(tripEventsListElement, createEventNewFormTemplate(eventItems[0]), availableOffers);
 

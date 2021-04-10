@@ -3,9 +3,9 @@ import {
   createDestinationListTemplate,
   createEventTypesTemplate,
   createOffersTemplate,
-  formatInputDate,
   getOffersForType
-} from './utils';
+} from '../utils/event-items';
+import {formatInputDate} from '../utils/dates';
 
 const createEventEditFormTemplate = (event, availableOffers) => {
   const {

@@ -3,10 +3,9 @@ import {
   createDestinationListTemplate,
   createEventTypesTemplate,
   createOffersTemplate,
-  formatInputDate,
-  getOffersForType,
-  now
-} from './utils';
+  getOffersForType
+} from '../utils/event-items';
+import {formatInputDate, now} from '../utils/dates';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`;

@@ -1,13 +1,4 @@
 import dayjs from 'dayjs';
-import {TYPES} from '../const';
-
-const OFFERS = [
-  {title: 'Add luggage', price: 50},
-  {title: 'Switch to comfort', price: 80},
-  {title: 'Add breakfast', price: 50},
-  {title: 'Choose seats', price: 20},
-  {title: 'Travel by train', price: 120},
-];
 
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
@@ -41,24 +32,7 @@ const getRandomISODates = () => {
   };
 };
 
-const getRandomOffers = (offersCount) => {
-  return new Array(offersCount).fill().map(() => getRandomElement(OFFERS));
-};
-
-const generateAvailableOffers = () => {
-  const offersCount = getRandomInteger(0, 3);
-
-  return TYPES.map((type) => {
-    return {
-      type: type,
-      offers: new Array(offersCount).fill().map(() => getRandomElement(OFFERS)),
-    };
-  });
-};
-
 export {
-  generateAvailableOffers,
-  getRandomOffers,
   getRandomISODates,
   getRandomBool,
   getRandomElement,
