@@ -1,5 +1,10 @@
 import dayjs from 'dayjs';
 
+// 2021-04-01
+const START_DATE = 1617224400;
+// 2021-05-01
+const END_DATE = 1619816400;
+
 // Функция из интернета по генерации случайного числа из диапазона
 // Источник - https://github.com/you-dont-need/You-Dont-Need-Lodash-Underscore#_random
 const getRandomInteger = (a = 0, b = 1) => {
@@ -19,8 +24,8 @@ const getRandomBool = () => {
 };
 
 const getRandomISODates = () => {
-  // generate random Unix timestamp between 2021-04-01 and 2021-05-01
-  const start = dayjs.unix(getRandomInteger(1617224400,1619816400));
+  // generate random Unix timestamp between START_DATE and END_DATE
+  const start = dayjs.unix(getRandomInteger(START_DATE, END_DATE));
   const randomHours = getRandomInteger(0, 24);
   const randomMinutes = getRandomInteger(0, 60);
 

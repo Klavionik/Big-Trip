@@ -8,7 +8,7 @@ const getOffersForType = (eventType, offers) => {
     : [];
 };
 
-const nameFromTitle = (title) => {
+const generateInputNameFromTitle = (title) => {
   return title.toLowerCase().replaceAll(' ', '-');
 };
 
@@ -24,7 +24,7 @@ const createDescriptionTemplate = (description) => {
 const createOffersTemplate = (eventOffers, offersForType) => {
   const addOffers = (offers, checked = true) => {
     return offers.map(({title, price}) => {
-      const name = nameFromTitle(title);
+      const name = generateInputNameFromTitle(title);
       return `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="${name}-1" type="checkbox" name="${name}" ${checked ? 'checked' : ''}>
               <label class="event__offer-label" for="${name}-1">
