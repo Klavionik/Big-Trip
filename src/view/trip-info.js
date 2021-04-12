@@ -1,10 +1,6 @@
-const createTripInfoTemplate = (trip) => {
-  const {
-    route,
-    dates,
-    cost,
-  } = trip;
+import {createElement} from '../utils/common';
 
+const createTripInfoTemplate = ({route, dates, cost}) => {
   return `<section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">
               <h1 class="trip-info__title">${route}</h1>
@@ -18,4 +14,27 @@ const createTripInfoTemplate = (trip) => {
           </section>`;
 };
 
-export {createTripInfoTemplate};
+class TripInfo {
+  constructor(trip) {
+    this._element = null;
+    this._trip = trip;
+  }
+
+  getTemplate() {
+    return createTripInfoTemplate(this._trip);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default TripInfo;
