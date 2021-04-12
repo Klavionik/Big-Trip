@@ -1,5 +1,4 @@
 import {
-  createMenuTemplate,
   createTripInfoTemplate,
   createFiltersTemplate,
   createSortingTemplate,
@@ -8,6 +7,7 @@ import {
 } from './view';
 import {generateEventItem, generateAvailableOffers} from './mock/event-item';
 import {calculateTripInfo} from './utils/trip-info';
+import MenuView from './view/menu';
 
 const EVENT_ITEMS_COUNT = 8;
 
@@ -30,7 +30,7 @@ const tripMainElement = document.querySelector('.trip-main');
 const filtersElement = document.querySelector('.trip-controls__filters');
 const tripEventsElement = document.querySelector('.trip-events');
 
-render(navigationElement, createMenuTemplate());
+render(navigationElement, new MenuView().getTemplate());
 
 const tripInfo = calculateTripInfo(eventItems.slice(1));
 render(tripMainElement, createTripInfoTemplate(tripInfo), 'afterbegin');
