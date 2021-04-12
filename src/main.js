@@ -1,13 +1,13 @@
 import {
   createTripInfoTemplate,
   createFiltersTemplate,
-  createSortingTemplate,
   createEventItemTemplate,
   createEventEditFormTemplate
 } from './view';
 import {generateEventItem, generateAvailableOffers} from './mock/event-item';
 import {calculateTripInfo} from './utils/trip-info';
 import MenuView from './view/menu';
+import SortingView from './view/sorting';
 
 const EVENT_ITEMS_COUNT = 8;
 
@@ -35,7 +35,7 @@ render(navigationElement, new MenuView().getTemplate());
 const tripInfo = calculateTripInfo(eventItems.slice(1));
 render(tripMainElement, createTripInfoTemplate(tripInfo), 'afterbegin');
 render(filtersElement, createFiltersTemplate());
-render(tripEventsElement, createSortingTemplate());
+render(tripEventsElement, new SortingView().getTemplate());
 
 const tripEventsListElement = document.querySelector('.trip-events__list');
 
