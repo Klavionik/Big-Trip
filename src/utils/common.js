@@ -5,4 +5,8 @@ const createElement = (html) => {
   return container.content.firstElementChild;
 };
 
-export {createElement};
+const render = (container, element, position = 'beforeend') => {
+  container.insertAdjacentElement(position, element);
+};
+
+export {createElement, render};
