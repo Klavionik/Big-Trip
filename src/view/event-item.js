@@ -1,4 +1,5 @@
 import {processEventDate} from '../utils/dates';
+import {createElement} from '../utils/common';
 
 const createOffersTemplate = (offers) => {
   const createOffers = () => {
@@ -60,4 +61,28 @@ const createEventItemTemplate = (event) => {
               </div>
             </li>`;
 };
-export {createEventItemTemplate};
+
+class EventItem {
+  constructor(event) {
+    this._element = null;
+    this._event = event;
+  }
+
+  getTemplate() {
+    return createEventItemTemplate(this._event);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EventItem;

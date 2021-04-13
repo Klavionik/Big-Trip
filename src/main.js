@@ -1,5 +1,4 @@
 import {
-  createEventItemTemplate,
   createEventEditFormTemplate
 } from './view';
 import {generateEventItem, generateAvailableOffers} from './mock/event-item';
@@ -8,6 +7,7 @@ import MenuView from './view/menu';
 import SortingView from './view/sorting';
 import Filters from './view/filters';
 import TripInfo from './view/trip-info';
+import EventItemView from './view/event-item';
 
 const EVENT_ITEMS_COUNT = 8;
 
@@ -20,7 +20,7 @@ const render = (container, template, position = 'beforeend') => {
 
 const createEvents = (eventsList) => {
   eventItems.slice(1).forEach((event) => {
-    const eventItem = createEventItemTemplate(event);
+    const eventItem = new EventItemView(event).getTemplate();
     render(eventsList, eventItem);
   });
 };
