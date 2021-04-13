@@ -17,6 +17,20 @@ const eventItems = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);
 const createEvents = (eventsList) => {
   eventItems.slice(1).forEach((event) => {
     const eventItem = new EventItemView(event).getElement();
+    const eventEditForm = new EventEditFormView(event, availableOffers).getElement();
+
+    const replaceItemWithForm = () => eventItem.replaceWith(eventEditForm);
+    const replaceFormWithItem = () => eventEditForm.replaceWith(eventItem);
+
+    eventItem.querySelector('.event__rollup-btn').addEventListener('click',  replaceItemWithForm);
+
+    eventEditForm.addEventListener('submit', (evt) => {
+      evt.preventDefault();
+      replaceFormWithItem();
+    });
+
+    eventEditForm.querySelector('.event__rollup-btn').addEventListener('click', replaceFormWithItem);
+
     render(eventsList, eventItem);
   });
 };
@@ -36,6 +50,5 @@ render(tripEventsElement, new EventList().getElement());
 
 const tripEventsListElement = document.querySelector('.trip-events__list');
 
-render(tripEventsListElement, new EventEditFormView(eventItems[0], availableOffers).getElement());
 createEvents(tripEventsListElement);
 // render(tripEventsListElement, new EventNewFormView(eventItems[0], availableOffers).getElement());
