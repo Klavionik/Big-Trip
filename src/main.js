@@ -1,6 +1,3 @@
-import {
-  createEventEditFormTemplate
-} from './view';
 import {generateEventItem, generateAvailableOffers} from './mock/event-item';
 import {calculateTripInfo} from './utils/trip-info';
 import MenuView from './view/menu';
@@ -8,6 +5,7 @@ import SortingView from './view/sorting';
 import Filters from './view/filters';
 import TripInfo from './view/trip-info';
 import EventItemView from './view/event-item';
+import EventEditFormView from './view/event-item-edit';
 
 const EVENT_ITEMS_COUNT = 8;
 
@@ -39,7 +37,6 @@ render(tripEventsElement, new SortingView().getTemplate());
 
 const tripEventsListElement = document.querySelector('.trip-events__list');
 
-render(tripEventsListElement, createEventEditFormTemplate(eventItems[0], availableOffers));
+render(tripEventsListElement, new EventEditFormView(eventItems[0], availableOffers).getTemplate());
 createEvents(tripEventsListElement);
-// render(tripEventsListElement, createEventNewFormTemplate(eventItems[0]), availableOffers);
-
+// render(tripEventsListElement, new EventNewFormView(eventItems[0], availableOffers).getTemplate());
