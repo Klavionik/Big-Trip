@@ -7,9 +7,10 @@ import TripInfoView from './view/trip-info';
 import EventItemView from './view/event-item';
 import EventEditFormView from './view/event-edit-form';
 import EventListView from './view/event-list';
+import NoEventsView from './view/no-events';
 import {render} from './utils/common';
 
-const EVENT_ITEMS_COUNT = 8;
+const EVENT_ITEMS_COUNT = 0;
 
 const availableOffers = generateAvailableOffers();
 const eventItems = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);
@@ -45,19 +46,25 @@ const createEvents = (eventsList) => {
 };
 
 const navigationElement = document.querySelector('.trip-controls__navigation');
-const tripMainElement = document.querySelector('.trip-main');
 const filtersElement = document.querySelector('.trip-controls__filters');
-const tripEventsElement = document.querySelector('.trip-events');
 
 render(navigationElement, new MenuView().getElement());
-
-const tripInfo = calculateTripInfo(eventItems.slice(1));
-render(tripMainElement, new TripInfoView(tripInfo).getElement(), 'afterbegin');
 render(filtersElement, new FiltersView().getElement());
-render(tripEventsElement, new SortingView().getElement());
-render(tripEventsElement, new EventListView().getElement());
 
-const tripEventsListElement = document.querySelector('.trip-events__list');
+const tripEventsElement = document.querySelector('.trip-events');
 
-createEvents(tripEventsListElement);
+if (eventItems.length) {
+  const tripMainElement = document.querySelector('.trip-main');
+  const tripInfo = calculateTripInfo(eventItems.slice(1));
+  render(tripMainElement, new TripInfoView(tripInfo).getElement(), 'afterbegin');
+
+  render(tripEventsElement, new SortingView().getElement());
+  render(tripEventsElement, new EventListView().getElement());
+
+  const tripEventsListElement = document.querySelector('.trip-events__list');
+  createEvents(tripEventsListElement);
+} else {
+  render(tripEventsElement, new NoEventsView().getElement());
+}
+
 // render(tripEventsListElement, new EventNewFormView(eventItems[0], availableOffers).getElement());
