@@ -6,6 +6,7 @@ import {
   getOffersForType
 } from '../utils/event-items';
 import {formatInputDate, now} from '../utils/dates';
+import {createElement} from '../utils/common';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`;
@@ -86,4 +87,28 @@ const createEventNewFormTemplate = (event = {}, availableOffers) => {
               </form>`;
 };
 
-export {createEventNewFormTemplate};
+class EventNewForm {
+  constructor(event, availableOffers) {
+    this._element = null;
+    this._event = event;
+    this._availableOffers = availableOffers;
+  }
+
+  getTemplate() {
+    return createEventNewFormTemplate(this._event, this._availableOffers);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
+
+export default EventNewForm;
