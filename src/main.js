@@ -21,8 +21,17 @@ const createEvents = (eventsList) => {
 
     const replaceItemWithForm = () => eventItem.replaceWith(eventEditForm);
     const replaceFormWithItem = () => eventEditForm.replaceWith(eventItem);
+    const closeOnEscape = (evt) => {
+      if (evt.code === 'Escape') {
+        replaceFormWithItem();
+        document.removeEventListener('keydown', closeOnEscape);
+      }
+    };
 
-    eventItem.querySelector('.event__rollup-btn').addEventListener('click',  replaceItemWithForm);
+    eventItem.querySelector('.event__rollup-btn').addEventListener('click', () => {
+      replaceItemWithForm();
+      document.addEventListener('keydown', closeOnEscape);
+    });
 
     eventEditForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
