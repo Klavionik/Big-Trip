@@ -20,19 +20,23 @@ const createEvents = (eventsList) => {
     const eventItem = new EventItemView(event).getElement();
     const eventEditForm = new EventEditFormView(event, availableOffers).getElement();
 
-    const replaceItemWithForm = () => eventItem.replaceWith(eventEditForm);
-    const replaceFormWithItem = () => eventEditForm.replaceWith(eventItem);
+    const replaceItemWithForm = () => {
+      eventItem.replaceWith(eventEditForm);
+      document.addEventListener('keydown', closeOnEscape);
+    };
+
+    const replaceFormWithItem = () => {
+      eventEditForm.replaceWith(eventItem);
+      document.removeEventListener('keydown', closeOnEscape);
+    };
+
     const closeOnEscape = (evt) => {
       if (evt.code === 'Escape') {
         replaceFormWithItem();
-        document.removeEventListener('keydown', closeOnEscape);
       }
     };
 
-    eventItem.querySelector('.event__rollup-btn').addEventListener('click', () => {
-      replaceItemWithForm();
-      document.addEventListener('keydown', closeOnEscape);
-    });
+    eventItem.querySelector('.event__rollup-btn').addEventListener('click', replaceItemWithForm);
 
     eventEditForm.addEventListener('submit', (evt) => {
       evt.preventDefault();
