@@ -84,10 +84,33 @@ class EventEditForm extends AbstractView {
     super();
     this._event = event;
     this._availableOffers = availableOffers;
+
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
+    this._submitHandler = this._submitHandler.bind(this);
   }
 
   getTemplate() {
     return createEventEditFormTemplate(this._event, this._availableOffers);
+  }
+
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.rollupClick();
+  }
+
+  _submitHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.submit();
+  }
+
+  setRollupClickHandler(cb) {
+    this._callbacks.rollupClick = cb;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
+  }
+
+  setSubmitHandler(cb) {
+    this._callbacks.submit = cb;
+    this.getElement().addEventListener('submit', this._submitHandler);
   }
 }
 

@@ -17,16 +17,16 @@ const eventItems = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);
 
 const createEvents = (eventsList) => {
   eventItems.slice(1).forEach((event) => {
-    const eventItem = new EventItemView(event).getElement();
-    const eventEditForm = new EventEditFormView(event, availableOffers).getElement();
+    const eventItem = new EventItemView(event);
+    const eventEditForm = new EventEditFormView(event, availableOffers);
 
     const replaceItemWithForm = () => {
-      eventItem.replaceWith(eventEditForm);
+      eventItem.getElement().replaceWith(eventEditForm.getElement());
       document.addEventListener('keydown', closeOnEscape);
     };
 
     const replaceFormWithItem = () => {
-      eventEditForm.replaceWith(eventItem);
+      eventEditForm.getElement().replaceWith(eventItem.getElement());
       document.removeEventListener('keydown', closeOnEscape);
     };
 
@@ -36,16 +36,11 @@ const createEvents = (eventsList) => {
       }
     };
 
-    eventItem.querySelector('.event__rollup-btn').addEventListener('click', replaceItemWithForm);
+    eventItem.setRollupClickHandler(replaceItemWithForm);
+    eventEditForm.setSubmitHandler(replaceFormWithItem);
+    eventEditForm.setRollupClickHandler(replaceFormWithItem);
 
-    eventEditForm.addEventListener('submit', (evt) => {
-      evt.preventDefault();
-      replaceFormWithItem();
-    });
-
-    eventEditForm.querySelector('.event__rollup-btn').addEventListener('click', replaceFormWithItem);
-
-    render(eventsList, eventItem);
+    render(eventsList, eventItem.getElement());
   });
 };
 

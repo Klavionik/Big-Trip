@@ -66,10 +66,22 @@ class EventItem extends AbstractView {
   constructor(event) {
     super();
     this._event = event;
+
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createEventItemTemplate(this._event);
+  }
+
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.rollupClick();
+  }
+
+  setRollupClickHandler(cb) {
+    this._callbacks.rollupClick = cb;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 }
 
