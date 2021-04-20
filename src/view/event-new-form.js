@@ -6,7 +6,7 @@ import {
   getOffersForType
 } from '../utils/event-items';
 import {formatInputDate, now} from '../utils/dates';
-import {createElement} from '../utils/common';
+import AbstractView from './abstract-view';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`;
@@ -87,27 +87,15 @@ const createEventNewFormTemplate = (event = {}, availableOffers) => {
               </form>`;
 };
 
-class EventNewForm {
+class EventNewForm extends AbstractView {
   constructor(event, availableOffers) {
-    this._element = null;
+    super();
     this._event = event;
     this._availableOffers = availableOffers;
   }
 
   getTemplate() {
     return createEventNewFormTemplate(this._event, this._availableOffers);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 

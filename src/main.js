@@ -10,7 +10,7 @@ import EventListView from './view/event-list';
 import NoEventsView from './view/no-events';
 import {render} from './utils/common';
 
-const EVENT_ITEMS_COUNT = 0;
+const EVENT_ITEMS_COUNT = 10;
 
 const availableOffers = generateAvailableOffers();
 const eventItems = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);

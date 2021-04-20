@@ -6,7 +6,7 @@ import {
   getOffersForType
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
-import {createElement} from '../utils/common';
+import AbstractView from './abstract-view';
 
 const createEventEditFormTemplate = (event, availableOffers) => {
   const {
@@ -79,27 +79,15 @@ const createEventEditFormTemplate = (event, availableOffers) => {
               </form>`;
 };
 
-class EventEditForm {
+class EventEditForm extends AbstractView {
   constructor(event, availableOffers) {
-    this._element = null;
+    super();
     this._event = event;
     this._availableOffers = availableOffers;
   }
 
   getTemplate() {
     return createEventEditFormTemplate(this._event, this._availableOffers);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
 
