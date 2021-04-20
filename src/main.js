@@ -40,30 +40,29 @@ const createEvents = (eventsList) => {
     eventEditForm.setSubmitHandler(replaceFormWithItem);
     eventEditForm.setRollupClickHandler(replaceFormWithItem);
 
-    render(eventsList, eventItem.getElement());
+    render(eventsList, eventItem);
   });
 };
 
 const navigationElement = document.querySelector('.trip-controls__navigation');
 const filtersElement = document.querySelector('.trip-controls__filters');
 
-render(navigationElement, new MenuView().getElement());
-render(filtersElement, new FiltersView().getElement());
+render(navigationElement, new MenuView());
+render(filtersElement, new FiltersView());
 
 const tripEventsElement = document.querySelector('.trip-events');
 
 if (eventItems.length) {
   const tripMainElement = document.querySelector('.trip-main');
   const tripInfo = calculateTripInfo(eventItems.slice(1));
-  render(tripMainElement, new TripInfoView(tripInfo).getElement(), 'afterbegin');
+  render(tripMainElement, new TripInfoView(tripInfo), 'afterbegin');
 
-  render(tripEventsElement, new SortingView().getElement());
-  render(tripEventsElement, new EventListView().getElement());
+  render(tripEventsElement, new SortingView());
+  render(tripEventsElement, new EventListView());
 
   const tripEventsListElement = document.querySelector('.trip-events__list');
   createEvents(tripEventsListElement);
+  // render(tripEventsListElement, new EventNewFormView(eventItems[0], availableOffers));
 } else {
-  render(tripEventsElement, new NoEventsView().getElement());
+  render(tripEventsElement, new NoEventsView());
 }
-
-// render(tripEventsListElement, new EventNewFormView(eventItems[0], availableOffers).getElement());
