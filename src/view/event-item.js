@@ -1,5 +1,5 @@
 import {processEventDate} from '../utils/dates';
-import {createElement} from '../utils/common';
+import AbstractView from './abstract-view';
 
 const createOffersTemplate = (offers) => {
   const createOffers = () => {
@@ -62,26 +62,26 @@ const createEventItemTemplate = (event) => {
             </li>`;
 };
 
-class EventItem {
+class EventItem extends AbstractView {
   constructor(event) {
-    this._element = null;
+    super();
     this._event = event;
+
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
   }
 
   getTemplate() {
     return createEventItemTemplate(this._event);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+    this._callbacks.rollupClick();
   }
 
-  removeElement() {
-    this._element = null;
+  setRollupClickHandler(cb) {
+    this._callbacks.rollupClick = cb;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 }
 
