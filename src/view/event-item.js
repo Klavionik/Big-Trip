@@ -76,7 +76,10 @@ class EventItem extends AbstractView {
 
   _rollupClickHandler(evt) {
     evt.preventDefault();
-    this._callbacks.rollupClick();
+
+    if (typeof this._callbacks.rollupClick === 'function') {
+      this._callbacks.rollupClick();
+    }
   }
 
   setRollupClickHandler(cb) {
