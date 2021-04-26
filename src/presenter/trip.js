@@ -4,8 +4,7 @@ import TripInfoView from '../view/trip-info';
 import SortingView from '../view/sorting';
 import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
-import EventItemView from '../view/event-item';
-import EventEditFormView from '../view/event-edit-form';
+import EventPresenter from '../presenter/event';
 import {generateAvailableOffers} from '../mock/event-item';
 
 class Trip {
@@ -46,30 +45,8 @@ class Trip {
   }
 
   _renderEvent(event) {
-    const eventItem = new EventItemView(event);
-    const eventEditForm = new EventEditFormView(event, this._availableOffers);
-
-    const replaceItemWithForm = () => {
-      eventItem.getElement().replaceWith(eventEditForm.getElement());
-      document.addEventListener('keydown', closeOnEscape);
-    };
-
-    const replaceFormWithItem = () => {
-      eventEditForm.getElement().replaceWith(eventItem.getElement());
-      document.removeEventListener('keydown', closeOnEscape);
-    };
-
-    const closeOnEscape = (evt) => {
-      if (evt.code === 'Escape') {
-        replaceFormWithItem();
-      }
-    };
-
-    eventItem.setRollupClickHandler(replaceItemWithForm);
-    eventEditForm.setSubmitHandler(replaceFormWithItem);
-    eventEditForm.setRollupClickHandler(replaceFormWithItem);
-
-    render(this._eventListComponent, eventItem);
+    const eventPresenter = new EventPresenter(this._eventListComponent, this._availableOffers);
+    eventPresenter.initialize(event);
   }
 
   _renderEventList() {
