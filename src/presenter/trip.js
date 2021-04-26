@@ -20,6 +20,7 @@ class Trip {
     this._sortingComponent = new SortingView();
 
     this._updateData = this._updateData.bind(this);
+    this._updateMode = this._updateMode.bind(this);
   }
 
   initialize(events) {
@@ -48,7 +49,12 @@ class Trip {
   }
 
   _renderEvent(event) {
-    const eventPresenter = new EventPresenter(this._eventListComponent, this._availableOffers, this._updateData);
+    const eventPresenter = new EventPresenter(
+      this._eventListComponent,
+      this._availableOffers,
+      this._updateData,
+      this._updateMode,
+    );
     eventPresenter.initialize(event);
     this._eventPresenters[event.id] = eventPresenter;
   }
@@ -76,6 +82,11 @@ class Trip {
       this._events[eventIndex] = updatedEvent;
       this._eventPresenters[updatedEvent.id].initialize(updatedEvent);
     }
+  }
+
+  _updateMode() {
+    Object.values(this._eventPresenters)
+      .forEach((presenter) => presenter.resetView());
   }
 }
 

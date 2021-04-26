@@ -2,8 +2,13 @@ import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
 
+const Mode = {
+  VIEW: 'VIEW',
+  EDIT: 'EDIT',
+};
+
 class Event {
-  constructor(eventList, availableOffers, updateData) {
+  constructor(eventList, availableOffers, updateData, updateMode) {
     this._eventList = eventList;
     this._availableOffers = availableOffers;
     this._updateData = updateData;
@@ -11,6 +16,9 @@ class Event {
     this._event = null;
     this._eventItem = null;
     this._eventEditForm = null;
+
+    this._mode = Mode.VIEW;
+    this._updateMode = updateMode;
 
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
@@ -35,13 +43,11 @@ class Event {
       return;
     }
 
-    const eventListElement = this._eventList.getElement();
-
-    if (eventListElement.contains(previousEventItem.getElement())) {
+    if (this._mode === Mode.VIEW) {
       replace(previousEventItem, this._eventItem);
     }
 
-    if (eventListElement.contains(previousEventEditForm.getElement())) {
+    if (this._mode === Mode.EDIT) {
       replace(previousEventEditForm, this._eventEditForm);
     }
 
@@ -49,14 +55,23 @@ class Event {
     remove(previousEventEditForm);
   }
 
+  resetView() {
+    if (this._mode === Mode.EDIT) {
+      this._replaceFormWithItem();
+    }
+  }
+
   _replaceItemWithForm() {
     replace(this._eventItem, this._eventEditForm);
     document.addEventListener('keydown', this._closeOnEscape);
+    this._updateMode();
+    this._mode = Mode.EDIT;
   }
 
   _replaceFormWithItem() {
     replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
+    this._mode = Mode.VIEW;
   }
 
   _closeOnEscape(evt) {
