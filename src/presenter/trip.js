@@ -13,10 +13,13 @@ class Trip {
     this._tripContainer = tripContainer;
 
     this._events = [];
+    this._eventPresenters = {};
     this._availableOffers = generateAvailableOffers();
 
     this._eventListComponent = new EventListView();
     this._sortingComponent = new SortingView();
+
+    this._updateData = this._updateData.bind(this);
   }
 
   initialize(events) {
@@ -45,8 +48,9 @@ class Trip {
   }
 
   _renderEvent(event) {
-    const eventPresenter = new EventPresenter(this._eventListComponent, this._availableOffers);
+    const eventPresenter = new EventPresenter(this._eventListComponent, this._availableOffers, this._updateData);
     eventPresenter.initialize(event);
+    this._eventPresenters[event.id] = eventPresenter;
   }
 
   _renderEventList() {
@@ -63,6 +67,15 @@ class Trip {
 
   _renderSorting() {
     render(this._tripContainer, this._sortingComponent);
+  }
+
+  _updateData(updatedEvent) {
+    const eventIndex = this._events.findIndex(({id}) => id === updatedEvent.id);
+
+    if (eventIndex !== -1) {
+      this._events[eventIndex] = updatedEvent;
+      this._eventPresenters[updatedEvent.id].initialize(updatedEvent);
+    }
   }
 }
 

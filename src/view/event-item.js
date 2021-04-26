@@ -68,6 +68,7 @@ class EventItem extends AbstractView {
     this._event = event;
 
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
+    this._isFavoriteClickHandler = this._isFavoriteClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -82,9 +83,22 @@ class EventItem extends AbstractView {
     }
   }
 
+  _isFavoriteClickHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.rollupClick === 'function') {
+      this._callbacks.isFavoriteClick();
+    }
+  }
+
   setRollupClickHandler(cb) {
     this._callbacks.rollupClick = cb;
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
+  }
+
+  setIsFavoriteClickHandler(cb) {
+    this._callbacks.isFavoriteClick = cb;
+    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._isFavoriteClickHandler);
   }
 }
 
