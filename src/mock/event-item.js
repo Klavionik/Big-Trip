@@ -5,6 +5,7 @@ import {
   getRandomISODates
 } from '../utils/mock';
 import {DESTINATIONS, TYPES} from '../const';
+import {nanoid} from 'nanoid';
 
 const OFFERS = [
   {title: 'Add luggage', price: 50},
@@ -60,6 +61,7 @@ const getRandomDescription = () => {
 
 const generateEventItem = () => {
   return {
+    id: nanoid(7),
     type: getRandomType(),
     destination: getRandomDestination(),
     ...getRandomISODates(),

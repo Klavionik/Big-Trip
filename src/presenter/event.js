@@ -1,6 +1,6 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
-import {render} from '../utils/common';
+import {render, replace} from '../utils/common';
 
 class Event {
   constructor(eventList, availableOffers) {
@@ -27,12 +27,12 @@ class Event {
   }
 
   _replaceItemWithForm() {
-    this._eventItem.getElement().replaceWith(this._eventEditForm.getElement());
+    replace(this._eventItem, this._eventEditForm);
     document.addEventListener('keydown', this._closeOnEscape);
   }
 
   _replaceFormWithItem() {
-    this._eventEditForm.getElement().replaceWith(this._eventItem.getElement());
+    replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
   }
 

@@ -14,4 +14,20 @@ const render = (container, child, position = 'beforeend') => {
   container.insertAdjacentElement(position, child);
 };
 
-export {createElement, render};
+const replace = (oldElement, newElement) => {
+  oldElement = oldElement instanceof AbstractView ? oldElement.getElement() : oldElement;
+  newElement = newElement instanceof AbstractView ? newElement.getElement() : newElement;
+
+  oldElement.replaceWith(newElement);
+};
+
+const remove = (component) => {
+  if (!(component instanceof AbstractView)) {
+    throw new Error('Can only delete an instance of AbstractView.');
+  }
+
+  component.getElement().remove();
+  component.removeElement();
+};
+
+export {createElement, render, replace, remove};
