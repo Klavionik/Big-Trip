@@ -96,7 +96,7 @@ class EventEditForm extends AbstractView {
   _rollupClickHandler(evt) {
     evt.preventDefault();
 
-    if (this._callbacks.rollupClick) {
+    if (typeof this._callbacks.rollupClick == 'function') {
       this._callbacks.rollupClick();
     }
   }

@@ -25,13 +25,7 @@ class Trip {
 
   initialize(events) {
     this._events = [...events];
-
-    if (this._events.length) {
-      this._renderSorting();
-      this._renderTrip();
-    } else {
-      this._renderNoEvents();
-    }
+    this._renderTrip();
   }
 
   _getInfo() {
@@ -39,9 +33,14 @@ class Trip {
   }
 
   _renderTrip() {
-    this._renderTripInfo();
-    this._renderEventList();
-    this._renderEvents();
+    if (this._events.length) {
+      this._renderTripInfo();
+      this._renderSorting();
+      this._renderEventsContainer();
+      this._renderEvents();
+    } else {
+      this._renderNoEvents();
+    }
   }
 
   _renderTripInfo() {
@@ -59,7 +58,7 @@ class Trip {
     this._eventPresenters[event.id] = eventPresenter;
   }
 
-  _renderEventList() {
+  _renderEventsContainer() {
     render(this._tripContainer, this._eventListComponent);
   }
 
