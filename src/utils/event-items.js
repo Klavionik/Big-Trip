@@ -1,11 +1,7 @@
-import {DESTINATIONS, TYPES} from '../const';
+import {DESTINATIONS, OFFERS, TYPES} from '../const';
 
-const getOffersForType = (eventType, offers) => {
-  return eventType
-    ? Object.values(offers).find(({type}) => {
-      return eventType === type;
-    }).offers
-    : [];
+const getOffersForType = (eventType) => {
+  return [...OFFERS.find(({type}) => type === eventType).offers];
 };
 
 const generateInputNameFromTitle = (title) => {
@@ -22,6 +18,10 @@ const createDescriptionTemplate = (description) => {
 };
 
 const createOffersTemplate = (eventOffers, offersForType) => {
+  const setOffersForType = new Set(offersForType);
+  const setEventOffers = new Set(eventOffers);
+  const uniqueOffersForType = [...new Set([...setOffersForType].filter((offer) => !setEventOffers.has(offer)))];
+
   const addOffers = (offers, checked = true) => {
     return offers.map(({title, price}) => {
       const name = generateInputNameFromTitle(title);
@@ -36,14 +36,14 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     }).join('');
   };
 
-  const hasOffers = eventOffers.length || offersForType.length;
+  const hasOffers = eventOffers.length || uniqueOffersForType.length;
 
   return hasOffers
     ? `<section class="event__section  event__section--offers">
            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
            <div class="event__available-offers">
              ${eventOffers.length ? addOffers(eventOffers): ''}
-             ${offersForType.length ? addOffers(offersForType, false) : ''}
+             ${offersForType.length ? addOffers(uniqueOffersForType, false) : ''}
            </div>
          </section>`
     : '';

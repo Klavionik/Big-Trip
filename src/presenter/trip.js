@@ -5,7 +5,6 @@ import SortingView from '../view/sorting';
 import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
-import {generateAvailableOffers} from '../mock/event-item';
 
 class Trip {
   constructor(infoContainer, tripContainer) {
@@ -14,7 +13,6 @@ class Trip {
 
     this._events = [];
     this._eventPresenters = {};
-    this._availableOffers = generateAvailableOffers();
 
     this._eventListComponent = new EventListView();
     this._sortingComponent = new SortingView();
@@ -50,7 +48,6 @@ class Trip {
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(
       this._eventListComponent,
-      this._availableOffers,
       this._updateData,
       this._updateMode,
     );

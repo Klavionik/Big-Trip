@@ -6,14 +6,7 @@ import {
 } from '../utils/mock';
 import {DESTINATIONS, TYPES} from '../const';
 import {nanoid} from 'nanoid';
-
-const OFFERS = [
-  {title: 'Add luggage', price: 50},
-  {title: 'Switch to comfort', price: 80},
-  {title: 'Add breakfast', price: 50},
-  {title: 'Choose seats', price: 20},
-  {title: 'Travel by train', price: 120},
-];
+import {getOffersForType} from '../utils/event-items';
 
 const LOREM = [
   'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
@@ -24,8 +17,19 @@ const LOREM = [
 ];
 
 
-const getRandomOffers = (offersCount) => {
-  return new Array(offersCount).fill().map(() => getRandomElement(OFFERS));
+const getRandomOffers = (eventType, offersCount) => {
+  const offers = [];
+  const offersForType = getOffersForType(eventType);
+
+  while (offersForType.length && offersCount) {
+    const randomOffer = getRandomElement(offersForType);
+    const randomOfferIndex = offersForType.indexOf(randomOffer);
+    offersForType.splice(randomOfferIndex, 1);
+    offers.push(randomOffer);
+
+    offersCount--;
+  }
+  return offers;
 };
 
 const getRandomType = () => {
@@ -60,27 +64,18 @@ const getRandomDescription = () => {
 };
 
 const generateEventItem = () => {
+  const type = getRandomType();
+
   return {
     id: nanoid(7),
-    type: getRandomType(),
+    type: type,
     destination: getRandomDestination(),
     ...getRandomISODates(),
     price: getRandomInteger(50, 1000),
-    offers: getRandomOffers(getRandomInteger(0, 3)),
+    offers: getRandomOffers(type, getRandomInteger(0, 3)),
     isFavorite: getRandomBool(),
     description: getRandomDescription(),
   };
 };
 
-const generateAvailableOffers = () => {
-  const offersCount = getRandomInteger(0, 3);
-
-  return TYPES.map((type) => {
-    return {
-      type: type,
-      offers: new Array(offersCount).fill().map(() => getRandomElement(OFFERS)),
-    };
-  });
-};
-
-export {generateEventItem, generateAvailableOffers};
+export {generateEventItem, getRandomDescription};

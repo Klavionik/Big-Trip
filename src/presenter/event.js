@@ -8,9 +8,8 @@ const Mode = {
 };
 
 class Event {
-  constructor(eventList, availableOffers, updateData, updateMode) {
+  constructor(eventList, updateData, updateMode) {
     this._eventList = eventList;
-    this._availableOffers = availableOffers;
     this._updateData = updateData;
 
     this._event = null;
@@ -33,7 +32,7 @@ class Event {
     const previousEventEditForm = this._eventEditForm;
 
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event, this._availableOffers);
+    this._eventEditForm = new EventEditForm(event);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -69,6 +68,7 @@ class Event {
   }
 
   _replaceFormWithItem() {
+    this._eventEditForm.reset(this._event);
     replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
     this._mode = Mode.VIEW;
