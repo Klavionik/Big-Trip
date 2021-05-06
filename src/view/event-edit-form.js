@@ -87,9 +87,11 @@ class EventEditForm extends SmartView {
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
 
     this._setEventTypeClickHandler();
     this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
   }
 
   getTemplate() {
@@ -99,6 +101,25 @@ class EventEditForm extends SmartView {
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
     this.updateData({type: evt.target.value, offers: []});
+  }
+
+  _eventOfferClickHandler(evt) {
+    evt.preventDefault();
+
+    const label = evt.target.parentElement.querySelector('label');
+    const title = label.children[0].textContent;
+    const price  = parseInt(label.children[1].textContent);
+
+    const offer = {title, price};
+    let offers;
+
+    if (this._data.offers.every((value) => value.title !== title)) {
+      offers = [...this._data.offers, offer];
+    } else {
+      offers = this._data.offers.filter((value) => value.title !== title);
+    }
+
+    this.updateData({offers});
   }
 
   _destinationChangeHandler(evt) {
@@ -129,7 +150,7 @@ class EventEditForm extends SmartView {
     evt.preventDefault();
 
     if (typeof this._callbacks.submit === 'function') {
-      this._callbacks.submit();
+      this._callbacks.submit(this._data);
     }
   }
 
@@ -157,11 +178,24 @@ class EventEditForm extends SmartView {
     element.addEventListener('change', this._destinationChangeHandler);
   }
 
+  _setEventOfferClickHandler() {
+    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
+
+    elements.forEach((element) => {
+      element.addEventListener('click', this._eventOfferClickHandler);
+    });
+  }
+
   restoreHandlers() {
-    this._setEventTypeClickHandler();
-    this._setDestinationChangeHandler();
+    this._setInnerHandlers();
     this.setSubmitHandler(this._callbacks.submit);
     this.setRollupClickHandler(this._callbacks.rollupClick);
+  }
+
+  _setInnerHandlers() {
+    this._setEventTypeClickHandler();
+    this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
   }
 
   reset(event) {

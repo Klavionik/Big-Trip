@@ -23,6 +23,7 @@ class Event {
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
+    this._handleSubmit = this._handleSubmit.bind(this);
   }
 
   initialize(event) {
@@ -87,16 +88,16 @@ class Event {
 
   _setEventEditFormHandlers() {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
-    this._eventEditForm.setSubmitHandler(this._replaceFormWithItem);
+    this._eventEditForm.setSubmitHandler(this._handleSubmit);
   }
 
   _handleIsFavorite() {
-    const updatedData = Object.assign(
-      {},
-      this._event,
-      {isFavorite: !this._event.isFavorite},
-    );
-    this._updateData(updatedData);
+    this._updateData({...this._event, isFavorite: !this._event.isFavorite});
+  }
+
+  _handleSubmit(data) {
+    this._updateData({...this._event, ...data});
+    this._replaceFormWithItem();
   }
 }
 
