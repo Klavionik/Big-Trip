@@ -4,6 +4,19 @@ const getOffersForType = (eventType) => {
   return [...OFFERS.find(({type}) => type === eventType).offers];
 };
 
+const filterNotSelectedOffers = (eventOffers, offersForType) => {
+  const notSelected = [];
+
+  for (const offer of offersForType) {
+    const isSelected = eventOffers.some((eventOffer) => eventOffer.title === offer.title);
+    if (!isSelected) {
+      notSelected.push(offer);
+    }
+  }
+
+  return notSelected;
+};
+
 const generateInputNameFromTitle = (title) => {
   return title.toLowerCase().replaceAll(' ', '-');
 };
@@ -18,9 +31,7 @@ const createDescriptionTemplate = (description) => {
 };
 
 const createOffersTemplate = (eventOffers, offersForType) => {
-  const setOffersForType = new Set(offersForType);
-  const setEventOffers = new Set(eventOffers);
-  const uniqueOffersForType = [...new Set([...setOffersForType].filter((offer) => !setEventOffers.has(offer)))];
+  const notSelectedOffers = filterNotSelectedOffers(eventOffers, offersForType);
 
   const addOffers = (offers, checked = true) => {
     return offers.map(({title, price}) => {
@@ -36,14 +47,14 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     }).join('');
   };
 
-  const hasOffers = eventOffers.length || uniqueOffersForType.length;
+  const hasOffers = eventOffers.length || notSelectedOffers.length;
 
   return hasOffers
     ? `<section class="event__section  event__section--offers">
            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
            <div class="event__available-offers">
              ${eventOffers.length ? addOffers(eventOffers): ''}
-             ${offersForType.length ? addOffers(uniqueOffersForType, false) : ''}
+             ${offersForType.length ? addOffers(notSelectedOffers, false) : ''}
            </div>
          </section>`
     : '';

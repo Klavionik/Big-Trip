@@ -120,7 +120,7 @@ class EventEditForm extends SmartView {
   _rollupClickHandler(evt) {
     evt.preventDefault();
 
-    if (typeof this._callbacks.rollupClick == 'function') {
+    if (typeof this._callbacks.rollupClick === 'function') {
       this._callbacks.rollupClick();
     }
   }
