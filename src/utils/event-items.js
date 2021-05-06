@@ -17,6 +17,21 @@ const filterNotSelectedOffers = (eventOffers, offersForType) => {
   return notSelected;
 };
 
+const byTitle = (a, b) => {
+  const titleA = a.title.toUpperCase();
+  const titleB = b.title.toUpperCase();
+
+  if (titleA < titleB) {
+    return -1;
+  }
+
+  if (titleA > titleB) {
+    return 1;
+  }
+
+  return 0;
+};
+
 const generateInputNameFromTitle = (title) => {
   return title.toLowerCase().replaceAll(' ', '-');
 };
@@ -31,10 +46,8 @@ const createDescriptionTemplate = (description) => {
 };
 
 const createOffersTemplate = (eventOffers, offersForType) => {
-  const notSelectedOffers = filterNotSelectedOffers(eventOffers, offersForType);
-
-  const addOffers = (offers, checked = true) => {
-    return offers.map(({title, price}) => {
+  const addOffers = (offers) => {
+    return offers.map(({title, price, checked}) => {
       const name = generateInputNameFromTitle(title);
       return `<div class="event__offer-selector">
               <input class="event__offer-checkbox  visually-hidden" id="${name}-1" type="checkbox" name="${name}" ${checked ? 'checked' : ''}>
@@ -47,14 +60,17 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     }).join('');
   };
 
-  const hasOffers = eventOffers.length || notSelectedOffers.length;
+  const notSelectedOffers = filterNotSelectedOffers(eventOffers, offersForType);
+  const allOffers = [
+    ...eventOffers.map((value) => { return {...value, checked: true}; }),
+    ...notSelectedOffers.map((value) => { return {...value, checked: false}; }),
+  ].sort(byTitle);
 
-  return hasOffers
+  return allOffers.length
     ? `<section class="event__section  event__section--offers">
            <h3 class="event__section-title  event__section-title--offers">Offers</h3>
            <div class="event__available-offers">
-             ${eventOffers.length ? addOffers(eventOffers): ''}
-             ${offersForType.length ? addOffers(notSelectedOffers, false) : ''}
+             ${addOffers(allOffers)}
            </div>
          </section>`
     : '';
