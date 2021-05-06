@@ -98,6 +98,54 @@ class EventEditForm extends SmartView {
     return createEventEditFormTemplate(this._data);
   }
 
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callbacks.submit);
+    this.setRollupClickHandler(this._callbacks.rollupClick);
+  }
+
+  reset(event) {
+    this.updateData(event);
+  }
+
+  setRollupClickHandler(cb) {
+    this._callbacks.rollupClick = cb;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
+  }
+
+  setSubmitHandler(cb) {
+    this._callbacks.submit = cb;
+    this.getElement().addEventListener('submit', this._submitHandler);
+  }
+
+  _setEventTypeClickHandler() {
+    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
+
+    eventTypeElements.forEach((element) => {
+      element.addEventListener('change', this._eventTypeClickHandler);
+    });
+  }
+
+  _setDestinationChangeHandler() {
+    const element = this.getElement().querySelector('.event__input--destination');
+
+    element.addEventListener('change', this._destinationChangeHandler);
+  }
+
+  _setEventOfferClickHandler() {
+    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
+
+    elements.forEach((element) => {
+      element.addEventListener('click', this._eventOfferClickHandler);
+    });
+  }
+
+  _setInnerHandlers() {
+    this._setEventTypeClickHandler();
+    this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
+  }
+
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
     this.updateData({type: evt.target.value, offers: []});
@@ -152,54 +200,6 @@ class EventEditForm extends SmartView {
     if (typeof this._callbacks.submit === 'function') {
       this._callbacks.submit(this._data);
     }
-  }
-
-  setRollupClickHandler(cb) {
-    this._callbacks.rollupClick = cb;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
-  }
-
-  setSubmitHandler(cb) {
-    this._callbacks.submit = cb;
-    this.getElement().addEventListener('submit', this._submitHandler);
-  }
-
-  _setEventTypeClickHandler() {
-    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
-
-    eventTypeElements.forEach((element) => {
-      element.addEventListener('change', this._eventTypeClickHandler);
-    });
-  }
-
-  _setDestinationChangeHandler() {
-    const element = this.getElement().querySelector('.event__input--destination');
-
-    element.addEventListener('change', this._destinationChangeHandler);
-  }
-
-  _setEventOfferClickHandler() {
-    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
-
-    elements.forEach((element) => {
-      element.addEventListener('click', this._eventOfferClickHandler);
-    });
-  }
-
-  restoreHandlers() {
-    this._setInnerHandlers();
-    this.setSubmitHandler(this._callbacks.submit);
-    this.setRollupClickHandler(this._callbacks.rollupClick);
-  }
-
-  _setInnerHandlers() {
-    this._setEventTypeClickHandler();
-    this._setDestinationChangeHandler();
-    this._setEventOfferClickHandler();
-  }
-
-  reset(event) {
-    this.updateData(event);
   }
 }
 
