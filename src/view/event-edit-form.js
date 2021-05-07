@@ -2,13 +2,13 @@ import {
   createDescriptionTemplate,
   createDestinationListTemplate,
   createEventTypesTemplate,
-  createOffersTemplate,
-  getOffersForType
+  createOffersTemplate, getOffersForType
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
-import AbstractView from './abstract-view';
+import SmartView from './smart-view';
+import {getRandomDescription} from '../mock/event-item';
 
-const createEventEditFormTemplate = (event, availableOffers) => {
+const createEventEditFormTemplate = (event) => {
   const {
     type,
     destination,
@@ -21,7 +21,7 @@ const createEventEditFormTemplate = (event, availableOffers) => {
 
   const inputStart = formatInputDate(start);
   const inputEnd = formatInputDate(end);
-  const offersForType = getOffersForType(type, availableOffers);
+  const offersForType = getOffersForType(type);
 
   return `<form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -79,34 +79,33 @@ const createEventEditFormTemplate = (event, availableOffers) => {
               </form>`;
 };
 
-class EventEditForm extends AbstractView {
-  constructor(event, availableOffers) {
-    super();
-    this._event = event;
-    this._availableOffers = availableOffers;
+class EventEditForm extends SmartView {
+  constructor(event) {
+    super({...event});
 
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
+    this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
+
+    this._setEventTypeClickHandler();
+    this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
   }
 
   getTemplate() {
-    return createEventEditFormTemplate(this._event, this._availableOffers);
+    return createEventEditFormTemplate(this._data);
   }
 
-  _rollupClickHandler(evt) {
-    evt.preventDefault();
-
-    if (this._callbacks.rollupClick) {
-      this._callbacks.rollupClick();
-    }
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this.setSubmitHandler(this._callbacks.submit);
+    this.setRollupClickHandler(this._callbacks.rollupClick);
   }
 
-  _submitHandler(evt) {
-    evt.preventDefault();
-
-    if (typeof this._callbacks.submit === 'function') {
-      this._callbacks.submit();
-    }
+  reset(event) {
+    this.updateData(event);
   }
 
   setRollupClickHandler(cb) {
@@ -117,6 +116,90 @@ class EventEditForm extends AbstractView {
   setSubmitHandler(cb) {
     this._callbacks.submit = cb;
     this.getElement().addEventListener('submit', this._submitHandler);
+  }
+
+  _setEventTypeClickHandler() {
+    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
+
+    eventTypeElements.forEach((element) => {
+      element.addEventListener('change', this._eventTypeClickHandler);
+    });
+  }
+
+  _setDestinationChangeHandler() {
+    const element = this.getElement().querySelector('.event__input--destination');
+
+    element.addEventListener('change', this._destinationChangeHandler);
+  }
+
+  _setEventOfferClickHandler() {
+    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
+
+    elements.forEach((element) => {
+      element.addEventListener('click', this._eventOfferClickHandler);
+    });
+  }
+
+  _setInnerHandlers() {
+    this._setEventTypeClickHandler();
+    this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
+  }
+
+  _eventTypeClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({type: evt.target.value, offers: []});
+  }
+
+  _eventOfferClickHandler(evt) {
+    evt.preventDefault();
+
+    const label = evt.target.parentElement.querySelector('label');
+    const title = label.children[0].textContent;
+    const price  = parseInt(label.children[1].textContent);
+
+    const offer = {title, price};
+    let offers;
+
+    if (this._data.offers.every((value) => value.title !== title)) {
+      offers = [...this._data.offers, offer];
+    } else {
+      offers = this._data.offers.filter((value) => value.title !== title);
+    }
+
+    this.updateData({offers});
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+
+    const { value: destination } = evt.target;
+    let description = null;
+
+    if (destination.trim()) {
+      description = getRandomDescription();
+    }
+
+    this.updateData({
+      destination,
+      description,
+    });
+  }
+
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.rollupClick === 'function') {
+      this._callbacks.rollupClick();
+    }
+  }
+
+  _submitHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.submit === 'function') {
+      this._callbacks.submit(this._data);
+    }
   }
 }
 

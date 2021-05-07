@@ -8,9 +8,8 @@ const Mode = {
 };
 
 class Event {
-  constructor(eventList, availableOffers, updateData, updateMode) {
+  constructor(eventList, updateData, updateMode) {
     this._eventList = eventList;
-    this._availableOffers = availableOffers;
     this._updateData = updateData;
 
     this._event = null;
@@ -24,6 +23,7 @@ class Event {
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
+    this._handleSubmit = this._handleSubmit.bind(this);
   }
 
   initialize(event) {
@@ -33,7 +33,7 @@ class Event {
     const previousEventEditForm = this._eventEditForm;
 
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event, this._availableOffers);
+    this._eventEditForm = new EventEditForm(event);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -69,6 +69,7 @@ class Event {
   }
 
   _replaceFormWithItem() {
+    this._eventEditForm.reset(this._event);
     replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
     this._mode = Mode.VIEW;
@@ -87,16 +88,16 @@ class Event {
 
   _setEventEditFormHandlers() {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
-    this._eventEditForm.setSubmitHandler(this._replaceFormWithItem);
+    this._eventEditForm.setSubmitHandler(this._handleSubmit);
   }
 
   _handleIsFavorite() {
-    const updatedData = Object.assign(
-      {},
-      this._event,
-      {isFavorite: !this._event.isFavorite},
-    );
-    this._updateData(updatedData);
+    this._updateData({...this._event, isFavorite: !this._event.isFavorite});
+  }
+
+  _handleSubmit(data) {
+    this._updateData({...this._event, ...data});
+    this._replaceFormWithItem();
   }
 }
 
