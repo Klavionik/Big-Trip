@@ -10,11 +10,11 @@ import {SortType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 
 class Trip {
-  constructor(infoContainer, tripContainer) {
+  constructor(infoContainer, tripContainer, eventsModel) {
     this._infoContainer = infoContainer;
     this._tripContainer = tripContainer;
 
-    this._events = [];
+    this._eventsModel = eventsModel;
     this._eventPresenters = {};
 
     this._eventListComponent = new EventListView();
@@ -30,12 +30,18 @@ class Trip {
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
 
     this._setNewEventClickHandler();
-    render(this._tripContainer, this._eventListComponent);
   }
 
-  initialize(events) {
-    this._events = [...events].sort(compareByDate);
-    this._renderTrip();
+  initialize() {
+    render(this._tripContainer, this._eventListComponent);
+
+    const events = this._getEvents();
+
+    if (events.length) {
+      this._renderTrip(events);
+    } else {
+      this._renderNoEvents();
+    }
   }
 
   _clearEvents() {
@@ -44,26 +50,17 @@ class Trip {
     this._eventPresenters = {};
   }
 
-  _sortEvents(sortType) {
-    switch (sortType) {
+  _getEvents() {
+    const events = [...this._eventsModel.getEvents()];
+
+    switch (this._currentSortType) {
       case SortType.DAY:
-        this._events.sort(compareByDate);
-        break;
+        return events.sort(compareByDate);
       case SortType.TIME:
-        this._events.sort(compareByDuration);
-        break;
+        return events.sort(compareByDuration);
       case SortType.PRICE:
-        this._events.sort(compareByPrice);
-        break;
+        return events.sort(compareByPrice);
     }
-
-    this._currentSortType = sortType;
-    this._clearEvents();
-    this._renderEvents();
-  }
-
-  _getInfo() {
-    return calculateTripInfo(this._events);
   }
 
   _toggleNewEventButton() {
@@ -71,18 +68,15 @@ class Trip {
     button.disabled = !button.disabled;
   }
 
-  _renderTrip() {
-    if (this._events.length) {
-      this._renderTripInfo();
-      this._renderSorting();
-      this._renderEvents();
-    } else {
-      this._renderNoEvents();
-    }
+  _renderTrip(events) {
+    this._renderTripInfo(events);
+    this._renderSorting();
+    this._renderEvents(events);
   }
 
-  _renderTripInfo() {
-    render(this._infoContainer, new TripInfoView(this._getInfo()), 'afterbegin');
+  _renderTripInfo(events) {
+    const tripInfoComponent = new TripInfoView(calculateTripInfo(events));
+    render(this._infoContainer, tripInfoComponent, 'afterbegin');
   }
 
   _renderEvent(event) {
@@ -103,8 +97,8 @@ class Trip {
     }
   }
 
-  _renderEvents() {
-    this._events.forEach(this._renderEvent, this);
+  _renderEvents(events) {
+    events.forEach(this._renderEvent, this);
   }
 
   _renderNoEvents() {
@@ -118,12 +112,8 @@ class Trip {
   }
 
   _updateData(updatedEvent) {
-    const eventIndex = this._events.findIndex(({id}) => id === updatedEvent.id);
-
-    if (eventIndex !== -1) {
-      this._events[eventIndex] = updatedEvent;
-      this._eventPresenters[updatedEvent.id].initialize(updatedEvent);
-    }
+    this._eventsModel.updateEvent(updatedEvent);
+    this._eventPresenters[updatedEvent.id].initialize(updatedEvent);
   }
 
   _updateMode() {
@@ -148,7 +138,11 @@ class Trip {
 
   _handleSortTypeChanged(sortType) {
     if (sortType !== this._currentSortType) {
-      this._sortEvents(sortType);
+      this._currentSortType = sortType;
+      this._clearEvents();
+
+      const events = this._getEvents();
+      this._renderEvents(events);
     }
   }
 }
