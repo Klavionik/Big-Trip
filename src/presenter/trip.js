@@ -6,6 +6,8 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewFormView from '../view/event-new-form';
+import {SortType} from '../const';
+import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 
 class Trip {
   constructor(infoContainer, tripContainer) {
@@ -17,20 +19,47 @@ class Trip {
 
     this._eventListComponent = new EventListView();
     this._sortingComponent = new SortingView();
+    this._currentSortType = SortType.DAY;
+
     this._newEventFormComponent = null;
     this._noEventsComponent = null;
 
     this._updateData = this._updateData.bind(this);
     this._updateMode = this._updateMode.bind(this);
     this._newEventClickHandler = this._newEventClickHandler.bind(this);
+    this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
 
     this._setNewEventClickHandler();
     render(this._tripContainer, this._eventListComponent);
   }
 
   initialize(events) {
-    this._events = [...events];
+    this._events = [...events].sort(compareByDate);
     this._renderTrip();
+  }
+
+  _clearEvents() {
+    Object.values(this._eventPresenters)
+      .forEach((presenter) => presenter.destroy());
+    this._eventPresenters = {};
+  }
+
+  _sortEvents(sortType) {
+    switch (sortType) {
+      case SortType.DAY:
+        this._events.sort(compareByDate);
+        break;
+      case SortType.TIME:
+        this._events.sort(compareByDuration);
+        break;
+      case SortType.PRICE:
+        this._events.sort(compareByPrice);
+        break;
+    }
+
+    this._currentSortType = sortType;
+    this._clearEvents();
+    this._renderEvents();
   }
 
   _getInfo() {
@@ -85,6 +114,7 @@ class Trip {
 
   _renderSorting() {
     render(this._tripContainer, this._sortingComponent, 'afterbegin');
+    this._sortingComponent.setSortTypeChangeHandler(this._handleSortTypeChanged);
   }
 
   _updateData(updatedEvent) {
@@ -116,6 +146,11 @@ class Trip {
     this._renderNewEventForm();
   }
 
+  _handleSortTypeChanged(sortType) {
+    if (sortType !== this._currentSortType) {
+      this._sortEvents(sortType);
+    }
+  }
 }
 
 export default Trip;
