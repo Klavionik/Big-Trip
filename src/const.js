@@ -38,6 +38,12 @@ const UpdateType = {
   MAJOR: 'MAJOR',
 };
 
+const FilterType = {
+  EVERYTHING: 'everything',
+  FUTURE: 'future',
+  PAST: 'past',
+};
+
 const OFFERS = [
   {
     'type': 'taxi',
@@ -121,4 +127,12 @@ const OFFERS = [
   },
 ];
 
-export {TYPES, DESTINATIONS, OFFERS, SortType, ActionType, UpdateType};
+export {
+  TYPES,
+  DESTINATIONS,
+  OFFERS,
+  SortType,
+  ActionType,
+  UpdateType,
+  FilterType
+};

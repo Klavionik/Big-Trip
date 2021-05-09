@@ -8,11 +8,14 @@ import EventPresenter from '../presenter/event';
 import EventNewFormView from '../view/event-new-form';
 import {SortType, UpdateType, ActionType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
+import {filters} from '../utils/filters';
 
 class Trip {
-  constructor(infoContainer, tripContainer, eventsModel) {
+  constructor(infoContainer, tripContainer, eventsModel, filtersModel) {
     this._infoContainer = infoContainer;
     this._tripContainer = tripContainer;
+
+    this._filtersModel = filtersModel;
 
     this._eventsModel = eventsModel;
     this._eventPresenters = {};
@@ -39,6 +42,7 @@ class Trip {
   initialize() {
     render(this._tripContainer, this._eventListComponent);
     this._eventsModel.addSubscriber(this._handleModelEvent);
+    this._filtersModel.addSubscriber(this._handleModelEvent);
     this._renderTrip();
   }
 
@@ -57,14 +61,16 @@ class Trip {
 
   _getEvents() {
     const events = [...this._eventsModel.getEvents()];
+    const filter = this._filtersModel.getFilter();
+    const filteredEvents = filters[filter](events);
 
     switch (this._currentSortType) {
       case SortType.DAY:
-        return events.sort(compareByDate);
+        return filteredEvents.sort(compareByDate);
       case SortType.TIME:
-        return events.sort(compareByDuration);
+        return filteredEvents.sort(compareByDuration);
       case SortType.PRICE:
-        return events.sort(compareByPrice);
+        return filteredEvents.sort(compareByPrice);
     }
   }
 
