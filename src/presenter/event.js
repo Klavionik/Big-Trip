@@ -25,6 +25,7 @@ class Event {
     this._closeOnEscape = this._closeOnEscape.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleDelete = this._handleDelete.bind(this);
   }
 
   initialize(event) {
@@ -95,6 +96,7 @@ class Event {
   _setEventEditFormHandlers() {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
+    this._eventEditForm.setDeleteClickHandler(this._handleDelete);
   }
 
   _handleIsFavorite() {
@@ -112,6 +114,14 @@ class Event {
       {...this._event, ...data},
     );
     this._replaceFormWithItem();
+  }
+
+  _handleDelete(data) {
+    this._updateData(
+      ActionType.DELETE,
+      UpdateType.MINOR,
+      data,
+    );
   }
 }
 

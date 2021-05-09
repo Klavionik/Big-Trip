@@ -96,6 +96,7 @@ class EventEditForm extends SmartView {
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
+    this._deleteHandler = this._deleteHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
@@ -110,6 +111,7 @@ class EventEditForm extends SmartView {
     this._setDatepickers();
 
     this.setSubmitHandler(this._callbacks.submit);
+    this.setDeleteClickHandler(this._callbacks.delete);
     this.setRollupClickHandler(this._callbacks.rollupClick);
   }
 
@@ -164,6 +166,11 @@ class EventEditForm extends SmartView {
     elements.forEach((element) => {
       element.addEventListener('click', this._eventOfferClickHandler);
     });
+  }
+
+  setDeleteClickHandler(cb) {
+    this._callbacks.delete = cb;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteHandler);
   }
 
   _createDatepicker(selector, onChangeHandler) {
@@ -263,6 +270,14 @@ class EventEditForm extends SmartView {
     this.updateData({
       end: date.toISOString(),
     }, false);
+  }
+
+  _deleteHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.delete === 'function') {
+      this._callbacks.delete(this._data);
+    }
   }
 }
 
