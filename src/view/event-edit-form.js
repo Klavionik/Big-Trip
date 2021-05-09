@@ -95,6 +95,7 @@ class EventEditForm extends SmartView {
     this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
 
     this._setInnerHandlers();
     this._setDatepickers();
@@ -136,6 +137,11 @@ class EventEditForm extends SmartView {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
+  }
+
+  _setPriceInputHandler() {
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    priceInputElement.addEventListener('input', this._priceInputHandler);
   }
 
   _setEventTypeClickHandler() {
@@ -181,6 +187,7 @@ class EventEditForm extends SmartView {
     this._setEventTypeClickHandler();
     this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
+    this._setPriceInputHandler();
   }
 
   _eventTypeClickHandler(evt) {
@@ -210,7 +217,7 @@ class EventEditForm extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
 
-    const { value: destination } = evt.target;
+    const {value: destination} = evt.target;
     let description = null;
 
     if (destination.trim()) {
@@ -221,6 +228,13 @@ class EventEditForm extends SmartView {
       destination,
       description,
     });
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    const {value: price} = evt.target;
+
+    this.updateData({price: parseInt(price)}, false);
   }
 
   _rollupClickHandler(evt) {
