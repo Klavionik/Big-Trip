@@ -6,7 +6,7 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewFormView from '../view/event-new-form';
-import {SortType} from '../const';
+import {SortType, UpdateType, ActionType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 
 class Trip {
@@ -18,36 +18,41 @@ class Trip {
     this._eventPresenters = {};
 
     this._eventListComponent = new EventListView();
-    this._sortingComponent = new SortingView();
+
+    this._sortingComponent = null;
     this._currentSortType = SortType.DAY;
+
+    this._tripInfoComponent = null;
 
     this._newEventFormComponent = null;
     this._noEventsComponent = null;
 
-    this._updateData = this._updateData.bind(this);
     this._updateMode = this._updateMode.bind(this);
     this._newEventClickHandler = this._newEventClickHandler.bind(this);
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
+    this._handleViewAction = this._handleViewAction.bind(this);
+    this._handleModelEvent = this._handleModelEvent.bind(this);
 
     this._setNewEventClickHandler();
   }
 
   initialize() {
     render(this._tripContainer, this._eventListComponent);
-
-    const events = this._getEvents();
-
-    if (events.length) {
-      this._renderTrip(events);
-    } else {
-      this._renderNoEvents();
-    }
+    this._eventsModel.addSubscriber(this._handleModelEvent);
+    this._renderTrip();
   }
 
-  _clearEvents() {
+  _clearEvents(resetSortType = false) {
+    remove(this._sortingComponent);
+    remove(this._noEventsComponent);
+
     Object.values(this._eventPresenters)
       .forEach((presenter) => presenter.destroy());
     this._eventPresenters = {};
+
+    if (resetSortType) {
+      this._currentSortType = SortType.DAY;
+    }
   }
 
   _getEvents() {
@@ -68,21 +73,36 @@ class Trip {
     button.disabled = !button.disabled;
   }
 
-  _renderTrip(events) {
-    this._renderTripInfo(events);
-    this._renderSorting();
-    this._renderEvents(events);
+  _renderTrip(keepTripInfo = false) {
+    const events = this._getEvents();
+
+    if (events.length) {
+
+      if (!keepTripInfo) {
+        this._renderTripInfo(events);
+      }
+
+      this._renderSorting();
+      this._renderEvents(events);
+    } else {
+      this._renderNoEvents();
+    }
   }
 
   _renderTripInfo(events) {
-    const tripInfoComponent = new TripInfoView(calculateTripInfo(events));
-    render(this._infoContainer, tripInfoComponent, 'afterbegin');
+    if (this._tripInfoComponent !== null) {
+      remove(this._tripInfoComponent);
+      this._tripInfoComponent = null;
+    }
+
+    this._tripInfoComponent = new TripInfoView(calculateTripInfo(events));
+    render(this._infoContainer, this._tripInfoComponent, 'afterbegin');
   }
 
   _renderEvent(event) {
     const eventPresenter = new EventPresenter(
       this._eventListComponent,
-      this._updateData,
+      this._handleViewAction,
       this._updateMode,
     );
     eventPresenter.initialize(event);
@@ -107,13 +127,9 @@ class Trip {
   }
 
   _renderSorting() {
+    this._sortingComponent = new SortingView(this._currentSortType);
     render(this._tripContainer, this._sortingComponent, 'afterbegin');
     this._sortingComponent.setSortTypeChangeHandler(this._handleSortTypeChanged);
-  }
-
-  _updateData(updatedEvent) {
-    this._eventsModel.updateEvent(updatedEvent);
-    this._eventPresenters[updatedEvent.id].initialize(updatedEvent);
   }
 
   _updateMode() {
@@ -128,11 +144,7 @@ class Trip {
 
   _newEventClickHandler(evt) {
     evt.preventDefault();
-
-    if (this._noEventsComponent) {
-      remove(this._noEventsComponent);
-    }
-
+    remove(this._noEventsComponent);
     this._renderNewEventForm();
   }
 
@@ -140,9 +152,36 @@ class Trip {
     if (sortType !== this._currentSortType) {
       this._currentSortType = sortType;
       this._clearEvents();
+      this._renderTrip();
+    }
+  }
 
-      const events = this._getEvents();
-      this._renderEvents(events);
+  _handleViewAction(actionType, updateType, data) {
+    switch (actionType) {
+      case ActionType.ADD:
+        this._eventsModel.addEvent(updateType, data);
+        break;
+      case ActionType.UPDATE:
+        this._eventsModel.updateEvent(updateType, data);
+        break;
+      case ActionType.DELETE:
+        this._eventsModel.deleteEvent(updateType, data);
+    }
+  }
+
+  _handleModelEvent(updateType, data) {
+    switch (updateType) {
+      case UpdateType.PATCH:
+        this._eventPresenters[data.id].initialize(data);
+        break;
+      case UpdateType.MINOR:
+        this._clearEvents();
+        this._renderTrip();
+        break;
+      case UpdateType.MAJOR:
+        this._clearEvents(true);
+        this._renderTrip(true);
+        break;
     }
   }
 }

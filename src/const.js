@@ -26,6 +26,18 @@ const SortType = {
   PRICE: 'sort-price',
 };
 
+const ActionType = {
+  ADD: 'ADD',
+  UPDATE: 'UPDATE',
+  DELETE: 'DELETE',
+};
+
+const UpdateType = {
+  PATCH: 'PATCH',
+  MINOR: 'MINOR',
+  MAJOR: 'MAJOR',
+};
+
 const OFFERS = [
   {
     'type': 'taxi',
@@ -109,4 +121,4 @@ const OFFERS = [
   },
 ];
 
-export {TYPES, DESTINATIONS, OFFERS, SortType};
+export {TYPES, DESTINATIONS, OFFERS, SortType, ActionType, UpdateType};

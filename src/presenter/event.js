@@ -1,6 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
+import {UpdateType, ActionType} from '../const';
 
 const Mode = {
   VIEW: 'VIEW',
@@ -97,11 +98,19 @@ class Event {
   }
 
   _handleIsFavorite() {
-    this._updateData({...this._event, isFavorite: !this._event.isFavorite});
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, isFavorite: !this._event.isFavorite},
+    );
   }
 
   _handleSubmit(data) {
-    this._updateData({...this._event, ...data});
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.MINOR,
+      {...this._event, ...data},
+    );
     this._replaceFormWithItem();
   }
 }

@@ -12,8 +12,8 @@ class Observer {
       .filter((subscriber) => subscriber !== callback);
   }
 
-  _notify() {
-    this._subscribers.forEach((subscriber) => subscriber());
+  _notify(event, payload) {
+    this._subscribers.forEach((subscriber) => subscriber(event, payload));
   }
 }
 
