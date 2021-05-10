@@ -10,14 +10,13 @@ class SmartView extends AbstractView {
     this._data = data;
   }
 
-  updateData(data) {
+  updateData(data, redraw = true) {
     if (data) {
-      this._data = Object.assign(
-        {},
-        this._data,
-        data,
-      );
-      this.updateElement();
+      this._data = {...this._data, ...data};
+
+      if (redraw) {
+        this.updateElement();
+      }
     }
   }
 

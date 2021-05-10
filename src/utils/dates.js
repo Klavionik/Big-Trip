@@ -9,28 +9,24 @@ const DAY_IN_MS = HOUR_IN_MS * 24;
 const getDuration = (diff) => {
   const duration = dayjs.duration(diff);
 
-  const extractMinutes = () => duration.minutes().toString().padStart(2, '0');
-  const extractHours = () => duration.hours().toString().padStart(2, '0');
-  const extractDays = () => duration.days().toString().padStart(2, '0');
-
   if (diff < HOUR_IN_MS) {
-    return `${extractMinutes()}M`;
+    return duration.format('mm[M]');
   }
 
   if (diff >= HOUR_IN_MS && diff < DAY_IN_MS) {
-    return `${extractHours()}H ${extractMinutes()}M`;
+    return duration.format('HH[H] mm[M]');
   }
 
   if (diff >= DAY_IN_MS) {
-    return `${extractDays()}D ${extractHours()}H ${extractMinutes()}M`;
+    return duration.format('DD[D] HH[H] mm[M]');
   }
 };
 
-const formatTime = (date) => dayjs(date).format('HH:MM');
+const formatTime = (date) => dayjs(date).format('HH:mm');
 
 const formatDate = (date) => dayjs(date).format('MMM D');
 
-const formatInputDate = (date) => dayjs(date).format('DD/MM/YY HH:MM');
+const formatInputDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
 
 const now = () => dayjs();
 

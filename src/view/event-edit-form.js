@@ -7,6 +7,8 @@ import {
 import {formatInputDate} from '../utils/dates';
 import SmartView from './smart-view';
 import {getRandomDescription} from '../mock/event-item';
+import flatpickr from 'flatpickr';
+import 'flatpickr/dist/flatpickr.min.css';
 
 const createEventEditFormTemplate = (event) => {
   const {
@@ -83,15 +85,19 @@ class EventEditForm extends SmartView {
   constructor(event) {
     super({...event});
 
+    this._datepickerStart = null;
+    this._datepickerEnd = null;
+
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
     this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
+    this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
+    this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
 
-    this._setEventTypeClickHandler();
-    this._setDestinationChangeHandler();
-    this._setEventOfferClickHandler();
+    this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   getTemplate() {
@@ -100,6 +106,8 @@ class EventEditForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
+    this._setDatepickers();
+
     this.setSubmitHandler(this._callbacks.submit);
     this.setRollupClickHandler(this._callbacks.rollupClick);
   }
@@ -116,6 +124,18 @@ class EventEditForm extends SmartView {
   setSubmitHandler(cb) {
     this._callbacks.submit = cb;
     this.getElement().addEventListener('submit', this._submitHandler);
+  }
+
+  _destroyDatepickers() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
   }
 
   _setEventTypeClickHandler() {
@@ -138,6 +158,23 @@ class EventEditForm extends SmartView {
     elements.forEach((element) => {
       element.addEventListener('click', this._eventOfferClickHandler);
     });
+  }
+
+  _createDatepicker(selector, onChangeHandler) {
+    return flatpickr(
+      this.getElement().querySelector(selector),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        onChange: onChangeHandler,
+      },
+    );
+  }
+
+  _setDatepickers() {
+    this._destroyDatepickers();
+    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
+    this._datepickerEnd = this._createDatepicker('#event-end-time-1', this._dateEndChangeHandler);
   }
 
   _setInnerHandlers() {
@@ -200,6 +237,18 @@ class EventEditForm extends SmartView {
     if (typeof this._callbacks.submit === 'function') {
       this._callbacks.submit(this._data);
     }
+  }
+
+  _dateStartChangeHandler([date]) {
+    this.updateData({
+      start: date.toISOString(),
+    }, false);
+  }
+
+  _dateEndChangeHandler([date]) {
+    this.updateData({
+      end: date.toISOString(),
+    }, false);
   }
 }
 

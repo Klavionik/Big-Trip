@@ -17,7 +17,7 @@ const filterNotSelectedOffers = (eventOffers, offersForType) => {
   return notSelected;
 };
 
-const byTitle = (a, b) => {
+const compareByTitle = (a, b) => {
   const titleA = a.title.toUpperCase();
   const titleB = b.title.toUpperCase();
 
@@ -64,7 +64,7 @@ const createOffersTemplate = (eventOffers, offersForType) => {
   const allOffers = [
     ...eventOffers.map((value) => { return {...value, checked: true}; }),
     ...notSelectedOffers.map((value) => { return {...value, checked: false}; }),
-  ].sort(byTitle);
+  ].sort(compareByTitle);
 
   return allOffers.length
     ? `<section class="event__section  event__section--offers">
