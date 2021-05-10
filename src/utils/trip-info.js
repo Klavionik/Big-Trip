@@ -1,11 +1,7 @@
 import dayjs from 'dayjs';
-
-const sortByDate = (events) => {
-  return events.sort((first, second) => dayjs(first.start) - dayjs(second.start));
-};
+import {compareByDate} from './compare';
 
 const getRoute = (events) => {
-  sortByDate(events);
   const {length: eventPoints} = events;
   let route;
 
@@ -37,10 +33,12 @@ const getDates = (events) => {
 };
 
 const calculateTripInfo = (events) => {
+  const sortedEvents = [...events].sort(compareByDate);
+
   return {
-    route: getRoute(events),
-    dates: getDates(events),
-    cost: events.reduce((acc, event) => acc + event.price, 0),
+    route: getRoute(sortedEvents),
+    dates: getDates(sortedEvents),
+    cost: sortedEvents.reduce((acc, event) => acc + event.price, 0),
   };
 };
 

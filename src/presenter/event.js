@@ -61,6 +61,11 @@ class Event {
     }
   }
 
+  destroy() {
+    remove(this._eventItem);
+    remove(this._eventEditForm);
+  }
+
   _replaceItemWithForm() {
     replace(this._eventItem, this._eventEditForm);
     document.addEventListener('keydown', this._closeOnEscape);

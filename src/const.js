@@ -20,6 +20,12 @@ const DESTINATIONS = [
   'Regina',
 ];
 
+const SortType = {
+  DAY: 'sort-day',
+  TIME: 'sort-time',
+  PRICE: 'sort-price',
+};
+
 const OFFERS = [
   {
     'type': 'taxi',
@@ -103,4 +109,4 @@ const OFFERS = [
   },
 ];
 
-export {TYPES, DESTINATIONS, OFFERS};
+export {TYPES, DESTINATIONS, OFFERS, SortType};
