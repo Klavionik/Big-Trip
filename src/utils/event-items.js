@@ -1,4 +1,4 @@
-import {DESTINATIONS, OFFERS, TYPES} from '../const';
+import {OFFERS, TYPES} from '../const';
 import {compareByTitle} from './compare';
 
 const getOffersForType = (eventType) => {
