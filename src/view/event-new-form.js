@@ -6,7 +6,6 @@ import {
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
 import flatpickr from 'flatpickr';
-import {getRandomDescription} from '../mock/event-item';
 import SmartView from './smart-view';
 
 const createPhotosTemplate = (description) => {
@@ -19,7 +18,7 @@ const createPhotosTemplate = (description) => {
     : '';
 };
 
-const createEventNewFormTemplate = (event, availableOffers) => {
+const createEventNewFormTemplate = (event, availableOffers, availableDestinations) => {
   const {
     type,
     destination,
@@ -56,7 +55,7 @@ const createEventNewFormTemplate = (event, availableOffers) => {
                     </label>
                     <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1" required>
                     <datalist id="destination-list-1">
-                      ${createDestinationListTemplate()}
+                      ${createDestinationListTemplate(availableDestinations)}
                     </datalist>
                   </div>
 
@@ -88,10 +87,11 @@ const createEventNewFormTemplate = (event, availableOffers) => {
 };
 
 class EventNewForm extends SmartView {
-  constructor(event, availableOffers) {
+  constructor(event, availableOffers, availableDestinations) {
     super({...event});
 
     this._availableOffers = availableOffers;
+    this._availableDestinations = availableDestinations;
     this._datepickerStart = null;
     this._datepickerEnd = null;
 
@@ -110,7 +110,7 @@ class EventNewForm extends SmartView {
   }
 
   getTemplate() {
-    return createEventNewFormTemplate(this._data, this._availableOffers);
+    return createEventNewFormTemplate(this._data, this._availableOffers, this._availableDestinations);
   }
 
   restoreHandlers() {
@@ -194,6 +194,12 @@ class EventNewForm extends SmartView {
     }
   }
 
+  setDestinationChangeHandler(cb) {
+    this._callbacks.destinationChange = cb;
+    const element = this.getElement().querySelector('.event__input--destination');
+    element.addEventListener('change', this._destinationChangeHandler);
+  }
+
   _setInnerHandlers() {
     this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
@@ -228,17 +234,20 @@ class EventNewForm extends SmartView {
   _destinationChangeHandler(evt) {
     evt.preventDefault();
 
-    const {value: destination} = evt.target;
-    let description = null;
+    const {value} = evt.target;
 
-    if (destination.trim()) {
-      description = getRandomDescription();
+    const validDestination = this._availableDestinations.indexOf(value) !== -1;
+
+    if (!validDestination) {
+      evt.target.value = '';
+      return;
     }
 
-    this.updateData({
-      destination,
-      description,
-    });
+    if (typeof this._callbacks.destinationChange === 'function') {
+      this.updateData({destination: value});
+      this._callbacks.destinationChange(this._data);
+    }
+
   }
 
   _priceInputHandler(evt) {

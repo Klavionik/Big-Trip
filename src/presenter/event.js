@@ -9,11 +9,12 @@ const Mode = {
 };
 
 class Event {
-  constructor(eventList, updateData, updateMode, offersModel) {
+  constructor(eventList, updateData, updateMode, offersModel, destinationsModel) {
     this._eventList = eventList;
     this._updateData = updateData;
 
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._event = null;
     this._eventItem = null;
@@ -27,6 +28,7 @@ class Event {
     this._closeOnEscape = this._closeOnEscape.bind(this);
     this._handleEventType = this._handleEventType.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
+    this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleDelete = this._handleDelete.bind(this);
   }
@@ -38,9 +40,10 @@ class Event {
     const previousEventEditForm = this._eventEditForm;
 
     const availableOffers = this._offersModel.getOffers(event.type);
+    const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event, availableOffers);
+    this._eventEditForm = new EventEditForm(event, availableOffers, availableDestinations);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -103,6 +106,23 @@ class Event {
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
     this._eventEditForm.setEventTypeClickHandler(this._handleEventType);
+    this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
+  }
+
+  _handleDestination(data) {
+    if (this._event.destination === data.destination) {
+      return;
+    }
+
+    const newDescription = this._destinationsModel.getDescription(data.destination);
+
+    const payload = {...data, description: newDescription};
+
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, ...payload},
+    );
   }
 
   _handleEventType(data) {

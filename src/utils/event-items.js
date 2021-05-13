@@ -62,8 +62,8 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     : '';
 };
 
-const createDestinationListTemplate = () => {
-  return DESTINATIONS.map((destination) => {
+const createDestinationListTemplate = (destinations) => {
+  return destinations.map((destination) => {
     return `<option value="${destination}"></option>`;
   });
 };

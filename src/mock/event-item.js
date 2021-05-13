@@ -63,6 +63,15 @@ const getRandomDescription = () => {
     : null;
 };
 
+const generateDestinations = () => {
+  return DESTINATIONS.map((destination) => {
+    return {
+      destination,
+      description: getRandomDescription(),
+    };
+  });
+};
+
 const generateEventItem = () => {
   const type = getRandomType();
 
@@ -78,4 +87,4 @@ const generateEventItem = () => {
   };
 };
 
-export {generateEventItem, getRandomDescription};
+export {generateEventItem, getRandomDescription, generateDestinations};

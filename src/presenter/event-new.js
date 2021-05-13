@@ -5,10 +5,11 @@ import EventNewForm from '../view/event-new-form';
 import {now} from '../utils/dates';
 
 class EventNew {
-  constructor(eventList, updateData, offersModel) {
+  constructor(eventList, updateData, offersModel, destinationsModel) {
     this._eventList = eventList;
     this._updateData = updateData;
     this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._eventNewForm = null;
     this._cancelCallback = null;
@@ -17,6 +18,7 @@ class EventNew {
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancel = this._handleCancel.bind(this);
     this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
+    this._handleDestinationChange = this._handleDestinationChange.bind(this);
   }
 
   initialize(cb, event) {
@@ -27,8 +29,9 @@ class EventNew {
     }
 
     const availableOffers = this._offersModel.getOffers(event.type);
+    const availableDestinations = this._destinationsModel.getDestinations();
 
-    this._eventNewForm = new EventNewForm(event, availableOffers);
+    this._eventNewForm = new EventNewForm(event, availableOffers, availableDestinations);
     this._setEventNewFormHandlers();
 
     render(this._eventList, this._eventNewForm, 'afterbegin');
@@ -67,6 +70,13 @@ class EventNew {
     this._eventNewForm.setSubmitHandler(this._handleSubmit);
     this._eventNewForm.setCancelClickHandler(this._handleCancel);
     this._eventNewForm.setEventTypeClickHandler(this._handleEventTypeChange);
+    this._eventNewForm.setDestinationChangeHandler(this._handleDestinationChange);
+  }
+
+  _handleDestinationChange(data) {
+    remove(this._eventNewForm);
+    const newDescription = this._destinationsModel.getDescription(data.destination);
+    this.initialize(this._cancelCallback, {...data, description: newDescription});
   }
 
   _handleEventTypeChange(data) {
