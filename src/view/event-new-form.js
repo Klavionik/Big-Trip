@@ -6,7 +6,9 @@ import {
   getOffersForType
 } from '../utils/event-items';
 import {formatInputDate, now} from '../utils/dates';
-import AbstractView from './abstract-view';
+import flatpickr from 'flatpickr';
+import {getRandomDescription} from '../mock/event-item';
+import SmartView from './smart-view';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`;
@@ -18,20 +20,20 @@ const createPhotosTemplate = (description) => {
     : '';
 };
 
-const createEventNewFormTemplate = (event = {}, availableOffers) => {
+const createEventNewFormTemplate = (event) => {
   const {
-    type = 'flight',
-    destination = '',
-    start = now(),
-    end = now(),
-    price = '',
-    offers = [],
+    type,
+    destination,
+    start,
+    end,
+    price,
+    offers,
     description,
   } = event;
 
   const inputStart = formatInputDate(start);
   const inputEnd = formatInputDate(end);
-  const offersForType = getOffersForType(type, availableOffers);
+  const offersForType = getOffersForType(type);
 
   return `<form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -87,15 +89,200 @@ const createEventNewFormTemplate = (event = {}, availableOffers) => {
               </form>`;
 };
 
-class EventNewForm extends AbstractView {
-  constructor(event, availableOffers) {
-    super();
-    this._event = event;
-    this._availableOffers = availableOffers;
+class EventNewForm extends SmartView {
+  constructor(event = null) {
+    if (!event) {
+      event = {
+        type: 'flight',
+        destination: '',
+        start: now(),
+        end: now(),
+        price: '',
+        offers: [],
+        description: null,
+      };
+    }
+    super({...event});
+
+    this._datepickerStart = null;
+    this._datepickerEnd = null;
+
+    this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
+    this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
+    this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
+    this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
+    this._priceInputHandler = this._priceInputHandler.bind(this);
+
+    this._submitHandler = this._submitHandler.bind(this);
+    this._cancelHandler = this._cancelHandler.bind(this);
+
+    this._setInnerHandlers();
+    this._setDatepickers();
   }
 
   getTemplate() {
-    return createEventNewFormTemplate(this._event, this._availableOffers);
+    return createEventNewFormTemplate(this._data);
+  }
+
+  restoreHandlers() {
+    this._setInnerHandlers();
+    this._setDatepickers();
+
+    this.setSubmitHandler(this._callbacks.submit);
+    this.setCancelClickHandler(this._callbacks.cancel);
+  }
+
+  reset(event) {
+    this.updateData(event);
+  }
+
+  setSubmitHandler(cb) {
+    this._callbacks.submit = cb;
+    this.getElement().addEventListener('submit', this._submitHandler);
+  }
+
+  setCancelClickHandler(cb) {
+    this._callbacks.cancel = cb;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelHandler);
+  }
+
+  _setPriceInputHandler() {
+    const priceInputElement = this.getElement().querySelector('.event__input--price');
+    priceInputElement.addEventListener('input', this._priceInputHandler);
+  }
+
+  _setEventTypeClickHandler() {
+    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
+
+    eventTypeElements.forEach((element) => {
+      element.addEventListener('change', this._eventTypeClickHandler);
+    });
+  }
+
+  _setDestinationChangeHandler() {
+    const element = this.getElement().querySelector('.event__input--destination');
+
+    element.addEventListener('change', this._destinationChangeHandler);
+  }
+
+  _setEventOfferClickHandler() {
+    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
+
+    elements.forEach((element) => {
+      element.addEventListener('click', this._eventOfferClickHandler);
+    });
+  }
+
+  _createDatepicker(selector, onChangeHandler) {
+    return flatpickr(
+      this.getElement().querySelector(selector),
+      {
+        enableTime: true,
+        dateFormat: 'd/m/y H:i',
+        onChange: onChangeHandler,
+      },
+    );
+  }
+
+  _setDatepickers() {
+    this._destroyDatepickers();
+    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
+    this._datepickerEnd = this._createDatepicker('#event-end-time-1', this._dateEndChangeHandler);
+  }
+
+  _destroyDatepickers() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+  }
+
+  _setInnerHandlers() {
+    this._setEventTypeClickHandler();
+    this._setDestinationChangeHandler();
+    this._setEventOfferClickHandler();
+    this._setPriceInputHandler();
+  }
+
+  _eventTypeClickHandler(evt) {
+    evt.preventDefault();
+    this.updateData({type: evt.target.value, offers: []});
+  }
+
+  _eventOfferClickHandler(evt) {
+    evt.preventDefault();
+
+    const label = evt.target.parentElement.querySelector('label');
+    const title = label.children[0].textContent;
+    const price  = parseInt(label.children[1].textContent);
+
+    const offer = {title, price};
+    let offers;
+
+    if (this._data.offers.every((value) => value.title !== title)) {
+      offers = [...this._data.offers, offer];
+    } else {
+      offers = this._data.offers.filter((value) => value.title !== title);
+    }
+
+    this.updateData({offers});
+  }
+
+  _destinationChangeHandler(evt) {
+    evt.preventDefault();
+
+    const {value: destination} = evt.target;
+    let description = null;
+
+    if (destination.trim()) {
+      description = getRandomDescription();
+    }
+
+    this.updateData({
+      destination,
+      description,
+    });
+  }
+
+  _priceInputHandler(evt) {
+    evt.preventDefault();
+    const {value: price} = evt.target;
+
+    this.updateData({price: parseInt(price)}, false);
+  }
+
+  _submitHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.submit === 'function') {
+      this._callbacks.submit(this._data);
+    }
+  }
+
+  _dateStartChangeHandler([date]) {
+    this.updateData({
+      start: date.toISOString(),
+    }, false);
+  }
+
+  _dateEndChangeHandler([date]) {
+    this.updateData({
+      end: date.toISOString(),
+    }, false);
+  }
+
+  _cancelHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.cancel === 'function') {
+      this._callbacks.cancel();
+    }
   }
 }
 

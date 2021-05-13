@@ -5,8 +5,8 @@ import SortingView from '../view/sorting';
 import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
-import EventNewFormView from '../view/event-new-form';
-import {SortType, UpdateType, ActionType} from '../const';
+import EventNewPresenter from './event-new';
+import {SortType, UpdateType, ActionType, FilterType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 
@@ -26,8 +26,6 @@ class Trip {
     this._currentSortType = SortType.DAY;
 
     this._tripInfoComponent = null;
-
-    this._newEventFormComponent = null;
     this._noEventsComponent = null;
 
     this._updateMode = this._updateMode.bind(this);
@@ -35,20 +33,35 @@ class Trip {
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
+    this._toggleNewEventButton = this._toggleNewEventButton.bind(this);
 
     this._setNewEventClickHandler();
   }
 
   initialize() {
+    this._eventNewPresenter = new EventNewPresenter(
+      this._eventListComponent,
+      this._handleViewAction,
+      this._toggleNewEventButton,
+    );
+
     render(this._tripContainer, this._eventListComponent);
     this._eventsModel.addSubscriber(this._handleModelEvent);
     this._filtersModel.addSubscriber(this._handleModelEvent);
     this._renderTrip();
   }
 
+  _addEvent() {
+    this._currentSortType = SortType.DAY;
+    this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._eventNewPresenter.initialize(this._toggleNewEventButton);
+    this._toggleNewEventButton();
+  }
+
   _clearEvents(resetSortType = false) {
     remove(this._sortingComponent);
     remove(this._noEventsComponent);
+    this._eventNewPresenter.destroy();
 
     Object.values(this._eventPresenters)
       .forEach((presenter) => presenter.destroy());
@@ -115,14 +128,6 @@ class Trip {
     this._eventPresenters[event.id] = eventPresenter;
   }
 
-  _renderNewEventForm() {
-    if (!this._newEventFormComponent) {
-      this._newEventFormComponent = new EventNewFormView();
-      render(this._eventListComponent, this._newEventFormComponent, 'afterbegin');
-      this._toggleNewEventButton();
-    }
-  }
-
   _renderEvents(events) {
     events.forEach(this._renderEvent, this);
   }
@@ -139,6 +144,7 @@ class Trip {
   }
 
   _updateMode() {
+    this._eventNewPresenter.destroy();
     Object.values(this._eventPresenters)
       .forEach((presenter) => presenter.resetView());
   }
@@ -151,7 +157,7 @@ class Trip {
   _newEventClickHandler(evt) {
     evt.preventDefault();
     remove(this._noEventsComponent);
-    this._renderNewEventForm();
+    this._addEvent();
   }
 
   _handleSortTypeChanged(sortType) {
