@@ -9,9 +9,11 @@ const Mode = {
 };
 
 class Event {
-  constructor(eventList, updateData, updateMode) {
+  constructor(eventList, updateData, updateMode, offersModel) {
     this._eventList = eventList;
     this._updateData = updateData;
+
+    this._offersModel = offersModel;
 
     this._event = null;
     this._eventItem = null;
@@ -23,6 +25,7 @@ class Event {
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
+    this._handleEventType = this._handleEventType.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleDelete = this._handleDelete.bind(this);
@@ -34,8 +37,10 @@ class Event {
     const previousEventItem = this._eventItem;
     const previousEventEditForm = this._eventEditForm;
 
+    const availableOffers = this._offersModel.getOffers(event.type);
+
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event);
+    this._eventEditForm = new EventEditForm(event, availableOffers);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -97,6 +102,15 @@ class Event {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
+    this._eventEditForm.setEventTypeClickHandler(this._handleEventType);
+  }
+
+  _handleEventType(data) {
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, ...data},
+    );
   }
 
   _handleIsFavorite() {

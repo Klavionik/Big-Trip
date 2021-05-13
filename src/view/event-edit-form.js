@@ -2,7 +2,7 @@ import {
   createDescriptionTemplate,
   createDestinationListTemplate,
   createEventTypesTemplate,
-  createOffersTemplate, getOffersForType
+  createOffersTemplate
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
 import SmartView from './smart-view';
@@ -10,7 +10,7 @@ import {getRandomDescription} from '../mock/event-item';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createEventEditFormTemplate = (event) => {
+const createEventEditFormTemplate = (event, availableOffers) => {
   const {
     type,
     destination,
@@ -23,7 +23,6 @@ const createEventEditFormTemplate = (event) => {
 
   const inputStart = formatInputDate(start);
   const inputEnd = formatInputDate(end);
-  const offersForType = getOffersForType(type);
 
   return `<form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -75,27 +74,29 @@ const createEventEditFormTemplate = (event) => {
                   </button>
                 </header>
                 <section class="event__details">
-                    ${createOffersTemplate(offers, offersForType)}
+                    ${createOffersTemplate(offers, availableOffers)}
                     ${createDescriptionTemplate(description)}
                 </section>
               </form>`;
 };
 
 class EventEditForm extends SmartView {
-  constructor(event) {
+  constructor(event, availableOffers = []) {
     super({...event});
 
+    this._availableOffers = availableOffers;
     this._datepickerStart = null;
     this._datepickerEnd = null;
 
     this._rollupClickHandler = this._rollupClickHandler.bind(this);
-    this._submitHandler = this._submitHandler.bind(this);
     this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
     this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
     this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
+
+    this._submitHandler = this._submitHandler.bind(this);
     this._deleteHandler = this._deleteHandler.bind(this);
 
     this._setInnerHandlers();
@@ -103,7 +104,7 @@ class EventEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEventEditFormTemplate(this._data);
+    return createEventEditFormTemplate(this._data, this._availableOffers);
   }
 
   restoreHandlers() {
@@ -113,6 +114,7 @@ class EventEditForm extends SmartView {
     this.setSubmitHandler(this._callbacks.submit);
     this.setDeleteClickHandler(this._callbacks.delete);
     this.setRollupClickHandler(this._callbacks.rollupClick);
+    this.setEventTypeClickHandler(this._callbacks.eventType);
   }
 
   reset(event) {
@@ -127,6 +129,15 @@ class EventEditForm extends SmartView {
   setSubmitHandler(cb) {
     this._callbacks.submit = cb;
     this.getElement().addEventListener('submit', this._submitHandler);
+  }
+
+  setEventTypeClickHandler(cb) {
+    this._callbacks.eventType = cb;
+    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
+
+    eventTypeElements.forEach((element) => {
+      element.addEventListener('change', this._eventTypeClickHandler);
+    });
   }
 
   _destroyDatepickers() {
@@ -144,14 +155,6 @@ class EventEditForm extends SmartView {
   _setPriceInputHandler() {
     const priceInputElement = this.getElement().querySelector('.event__input--price');
     priceInputElement.addEventListener('input', this._priceInputHandler);
-  }
-
-  _setEventTypeClickHandler() {
-    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
-
-    eventTypeElements.forEach((element) => {
-      element.addEventListener('change', this._eventTypeClickHandler);
-    });
   }
 
   _setDestinationChangeHandler() {
@@ -191,7 +194,6 @@ class EventEditForm extends SmartView {
   }
 
   _setInnerHandlers() {
-    this._setEventTypeClickHandler();
     this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
@@ -199,7 +201,7 @@ class EventEditForm extends SmartView {
 
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
-    this.updateData({type: evt.target.value, offers: []});
+    this._callbacks.eventType({type: evt.target.value, offers: []});
   }
 
   _eventOfferClickHandler(evt) {

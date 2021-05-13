@@ -2,10 +2,9 @@ import {
   createDescriptionTemplate,
   createDestinationListTemplate,
   createEventTypesTemplate,
-  createOffersTemplate,
-  getOffersForType
+  createOffersTemplate
 } from '../utils/event-items';
-import {formatInputDate, now} from '../utils/dates';
+import {formatInputDate} from '../utils/dates';
 import flatpickr from 'flatpickr';
 import {getRandomDescription} from '../mock/event-item';
 import SmartView from './smart-view';
@@ -20,7 +19,7 @@ const createPhotosTemplate = (description) => {
     : '';
 };
 
-const createEventNewFormTemplate = (event) => {
+const createEventNewFormTemplate = (event, availableOffers) => {
   const {
     type,
     destination,
@@ -33,7 +32,6 @@ const createEventNewFormTemplate = (event) => {
 
   const inputStart = formatInputDate(start);
   const inputEnd = formatInputDate(end);
-  const offersForType = getOffersForType(type);
 
   return `<form class="event event--edit" action="#" method="post">
                 <header class="event__header">
@@ -82,7 +80,7 @@ const createEventNewFormTemplate = (event) => {
                   <button class="event__reset-btn" type="reset">Cancel</button>
                 </header>
                 <section class="event__details">
-                  ${createOffersTemplate(offers, offersForType)}
+                  ${createOffersTemplate(offers, availableOffers)}
                   ${createDescriptionTemplate(description)}
                   ${createPhotosTemplate(description)}
                 </section>
@@ -90,20 +88,10 @@ const createEventNewFormTemplate = (event) => {
 };
 
 class EventNewForm extends SmartView {
-  constructor(event = null) {
-    if (!event) {
-      event = {
-        type: 'flight',
-        destination: '',
-        start: now(),
-        end: now(),
-        price: '',
-        offers: [],
-        description: null,
-      };
-    }
+  constructor(event, availableOffers) {
     super({...event});
 
+    this._availableOffers = availableOffers;
     this._datepickerStart = null;
     this._datepickerEnd = null;
 
@@ -122,7 +110,7 @@ class EventNewForm extends SmartView {
   }
 
   getTemplate() {
-    return createEventNewFormTemplate(this._data);
+    return createEventNewFormTemplate(this._data, this._availableOffers);
   }
 
   restoreHandlers() {
@@ -131,6 +119,7 @@ class EventNewForm extends SmartView {
 
     this.setSubmitHandler(this._callbacks.submit);
     this.setCancelClickHandler(this._callbacks.cancel);
+    this.setEventTypeClickHandler(this._callbacks.eventType);
   }
 
   reset(event) {
@@ -152,7 +141,9 @@ class EventNewForm extends SmartView {
     priceInputElement.addEventListener('input', this._priceInputHandler);
   }
 
-  _setEventTypeClickHandler() {
+  setEventTypeClickHandler(cb) {
+    this._callbacks.eventType = cb;
+
     const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
 
     eventTypeElements.forEach((element) => {
@@ -204,7 +195,6 @@ class EventNewForm extends SmartView {
   }
 
   _setInnerHandlers() {
-    this._setEventTypeClickHandler();
     this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
@@ -213,6 +203,7 @@ class EventNewForm extends SmartView {
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
     this.updateData({type: evt.target.value, offers: []});
+    this._callbacks.eventType(this._data);
   }
 
   _eventOfferClickHandler(evt) {

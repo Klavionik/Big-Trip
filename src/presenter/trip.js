@@ -11,11 +11,13 @@ import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare
 import {filters} from '../utils/filters';
 
 class Trip {
-  constructor(infoContainer, tripContainer, eventsModel, filtersModel) {
+  constructor(infoContainer, tripContainer, eventsModel, filtersModel, offersModel) {
     this._infoContainer = infoContainer;
     this._tripContainer = tripContainer;
 
     this._filtersModel = filtersModel;
+
+    this._offersModel = offersModel;
 
     this._eventsModel = eventsModel;
     this._eventPresenters = {};
@@ -42,7 +44,7 @@ class Trip {
     this._eventNewPresenter = new EventNewPresenter(
       this._eventListComponent,
       this._handleViewAction,
-      this._toggleNewEventButton,
+      this._offersModel,
     );
 
     render(this._tripContainer, this._eventListComponent);
@@ -123,6 +125,7 @@ class Trip {
       this._eventListComponent,
       this._handleViewAction,
       this._updateMode,
+      this._offersModel,
     );
     eventPresenter.initialize(event);
     this._eventPresenters[event.id] = eventPresenter;
