@@ -59,7 +59,7 @@ class EventNew {
       type: 'flight',
       destination: '',
       start: now(),
-      end: now(),
+      end: null,
       price: '',
       offers: [],
       description: null,

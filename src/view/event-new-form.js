@@ -183,7 +183,10 @@ class EventNewForm extends SmartView {
     this._datepickerEnd = this._createDatepicker(
       '#event-end-time-1',
       this._dateEndChangeHandler,
-      {minDate: formatInputDate(this._data.start)},
+      {
+        minDate: formatInputDate(this._data.start),
+        defaultDate: this._data.end,
+      },
     );
   }
 
@@ -271,9 +274,13 @@ class EventNewForm extends SmartView {
   }
 
   _dateStartChangeHandler([date]) {
-    this.updateData({
-      start: date.toISOString(),
-    }, false);
+    const payload = {start: date.toISOString()};
+
+    if (this._data.end && (date > new Date(this._data.end))) {
+      payload.end = date.toISOString();
+    }
+
+    this.updateData(payload, false);
     this._setDatepickers();
   }
 
@@ -281,6 +288,7 @@ class EventNewForm extends SmartView {
     this.updateData({
       end: date.toISOString(),
     }, false);
+    this._setDatepickers();
   }
 
   _cancelHandler(evt) {

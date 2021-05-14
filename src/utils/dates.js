@@ -30,7 +30,7 @@ const formatTime = (date) => dayjs(date).format('HH:mm');
 
 const formatDate = (date) => dayjs(date).format('MMM D');
 
-const formatInputDate = (date) => dayjs(date).format('DD/MM/YY HH:mm');
+const formatInputDate = (date) => date ? dayjs(date).format('DD/MM/YY HH:mm') : '';
 
 const now = () => dayjs();
 
