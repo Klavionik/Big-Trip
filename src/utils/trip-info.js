@@ -32,13 +32,18 @@ const getDates = (events) => {
   return dates;
 };
 
+const calculacteEventCost = (acc, event) => {
+  const offersCost = event.offers.reduce((acc, offer) => acc + offer.price, 0);
+  return acc + event.price + offersCost;
+};
+
 const calculateTripInfo = (events) => {
   const sortedEvents = [...events].sort(compareByDate);
 
   return {
     route: getRoute(sortedEvents),
     dates: getDates(sortedEvents),
-    cost: sortedEvents.reduce((acc, event) => acc + event.price, 0),
+    cost: sortedEvents.reduce(calculacteEventCost, 0),
   };
 };
 
