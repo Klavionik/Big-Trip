@@ -177,13 +177,14 @@ class EventEditForm extends SmartView {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteHandler);
   }
 
-  _createDatepicker(selector, onChangeHandler) {
+  _createDatepicker(selector, onChangeHandler, options) {
     return flatpickr(
       this.getElement().querySelector(selector),
       {
         enableTime: true,
         dateFormat: 'd/m/y H:i',
         onChange: onChangeHandler,
+        ...options,
       },
     );
   }
@@ -191,7 +192,11 @@ class EventEditForm extends SmartView {
   _setDatepickers() {
     this._destroyDatepickers();
     this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datepickerEnd = this._createDatepicker('#event-end-time-1', this._dateEndChangeHandler);
+    this._datepickerEnd = this._createDatepicker(
+      '#event-end-time-1',
+      this._dateEndChangeHandler,
+      {minDate: formatInputDate(this._data.start)},
+    );
   }
 
   _setInnerHandlers() {
@@ -267,6 +272,7 @@ class EventEditForm extends SmartView {
     this.updateData({
       start: date.toISOString(),
     }, false);
+    this._setDatepickers();
   }
 
   _dateEndChangeHandler([date]) {
