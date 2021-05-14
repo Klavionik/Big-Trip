@@ -96,14 +96,13 @@ class Trip {
   }
 
   _renderTrip(keepTripInfo = false) {
+    if (!keepTripInfo) {
+      this._renderTripInfo(this._eventsModel.getEvents());
+    }
+
     const events = this._getEvents();
 
     if (events.length) {
-
-      if (!keepTripInfo) {
-        this._renderTripInfo(events);
-      }
-
       this._renderSorting();
       this._renderEvents(events);
     } else {
@@ -117,8 +116,10 @@ class Trip {
       this._tripInfoComponent = null;
     }
 
-    this._tripInfoComponent = new TripInfoView(calculateTripInfo(events));
-    render(this._infoContainer, this._tripInfoComponent, 'afterbegin');
+    if (events.length) {
+      this._tripInfoComponent = new TripInfoView(calculateTripInfo(events));
+      render(this._infoContainer, this._tripInfoComponent, 'afterbegin');
+    }
   }
 
   _renderEvent(event) {
