@@ -1,6 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
+import {UpdateType, ActionType} from '../const';
 
 const Mode = {
   VIEW: 'VIEW',
@@ -8,9 +9,12 @@ const Mode = {
 };
 
 class Event {
-  constructor(eventList, updateData, updateMode) {
+  constructor(eventList, updateData, updateMode, offersModel, destinationsModel) {
     this._eventList = eventList;
     this._updateData = updateData;
+
+    this._offersModel = offersModel;
+    this._destinationsModel = destinationsModel;
 
     this._event = null;
     this._eventItem = null;
@@ -22,8 +26,11 @@ class Event {
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
+    this._handleEventType = this._handleEventType.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
+    this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
+    this._handleDelete = this._handleDelete.bind(this);
   }
 
   initialize(event) {
@@ -32,8 +39,11 @@ class Event {
     const previousEventItem = this._eventItem;
     const previousEventEditForm = this._eventEditForm;
 
+    const availableOffers = this._offersModel.getOffers(event.type);
+    const availableDestinations = this._destinationsModel.getDestinations();
+
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event);
+    this._eventEditForm = new EventEditForm(event, availableOffers, availableDestinations);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -94,15 +104,58 @@ class Event {
   _setEventEditFormHandlers() {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
+    this._eventEditForm.setDeleteClickHandler(this._handleDelete);
+    this._eventEditForm.setEventTypeClickHandler(this._handleEventType);
+    this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
+  }
+
+  _handleDestination(data) {
+    if (this._event.destination === data.destination) {
+      return;
+    }
+
+    const newDescription = this._destinationsModel.getDescription(data.destination);
+
+    const payload = {...data, description: newDescription};
+
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, ...payload},
+    );
+  }
+
+  _handleEventType(data) {
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, ...data},
+    );
   }
 
   _handleIsFavorite() {
-    this._updateData({...this._event, isFavorite: !this._event.isFavorite});
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.PATCH,
+      {...this._event, isFavorite: !this._event.isFavorite},
+    );
   }
 
   _handleSubmit(data) {
-    this._updateData({...this._event, ...data});
+    this._updateData(
+      ActionType.UPDATE,
+      UpdateType.MINOR,
+      {...this._event, ...data},
+    );
     this._replaceFormWithItem();
+  }
+
+  _handleDelete(data) {
+    this._updateData(
+      ActionType.DELETE,
+      UpdateType.MINOR,
+      data,
+    );
   }
 }
 

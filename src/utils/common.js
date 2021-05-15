@@ -22,6 +22,10 @@ const replace = (oldElement, newElement) => {
 };
 
 const remove = (component) => {
+  if (component === null) {
+    return;
+  }
+
   if (!(component instanceof AbstractView)) {
     throw new Error('Can only delete an instance of AbstractView.');
   }

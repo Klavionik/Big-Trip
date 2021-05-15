@@ -1,4 +1,4 @@
-import {DESTINATIONS, OFFERS, TYPES} from '../const';
+import {OFFERS, TYPES} from '../const';
 import {compareByTitle} from './compare';
 
 const getOffersForType = (eventType) => {
@@ -62,8 +62,8 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     : '';
 };
 
-const createDestinationListTemplate = () => {
-  return DESTINATIONS.map((destination) => {
+const createDestinationListTemplate = (destinations) => {
+  return destinations.map((destination) => {
     return `<option value="${destination}"></option>`;
   });
 };
