@@ -44,6 +44,11 @@ const FilterType = {
   PAST: 'past',
 };
 
+const MenuItem = {
+  TRIP: 'trip',
+  STATS: 'stats',
+};
+
 const OFFERS = [
   {
     'type': 'taxi',
@@ -134,5 +139,6 @@ export {
   SortType,
   ActionType,
   UpdateType,
-  FilterType
+  FilterType,
+  MenuItem
 };

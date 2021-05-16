@@ -31,13 +31,10 @@ class Trip {
     this._noEventsComponent = null;
 
     this._updateMode = this._updateMode.bind(this);
-    this._newEventClickHandler = this._newEventClickHandler.bind(this);
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._toggleNewEventButton = this._toggleNewEventButton.bind(this);
-
-    this._setNewEventClickHandler();
   }
 
   initialize() {
@@ -54,7 +51,18 @@ class Trip {
     this._renderTrip();
   }
 
-  _addEvent() {
+  hideTrip() {
+    this._tripContainer.classList.add('trip-events--hidden');
+    this._eventNewPresenter.destroy();
+  }
+
+  showTrip() {
+    this._currentSortType = SortType.DAY;
+    this._tripContainer.classList.remove('trip-events--hidden');
+  }
+
+  addEvent() {
+    remove(this._noEventsComponent);
     this._currentSortType = SortType.DAY;
     this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this._toggleNewEventButton);
@@ -153,17 +161,6 @@ class Trip {
     this._eventNewPresenter.destroy();
     Object.values(this._eventPresenters)
       .forEach((presenter) => presenter.resetView());
-  }
-
-  _setNewEventClickHandler() {
-    this._infoContainer.querySelector('.trip-main__event-add-btn')
-      .addEventListener('click', this._newEventClickHandler);
-  }
-
-  _newEventClickHandler(evt) {
-    evt.preventDefault();
-    remove(this._noEventsComponent);
-    this._addEvent();
   }
 
   _handleSortTypeChanged(sortType) {
