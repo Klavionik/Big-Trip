@@ -23,6 +23,12 @@ const tripEventsElement = document.querySelector('.trip-events');
 const statsComponent = new StatsView();
 render(tripEventsElement, statsComponent, 'afterend');
 
+const menuComponent = new MenuView();
+render(navigationElement, menuComponent);
+menuComponent.setMenuItemClickHandler(handleMenuItemClick);
+
+tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', handleNewEventClick);
+
 const eventsModel = new EventsModel();
 eventsModel.setEvents(events);
 
@@ -47,20 +53,7 @@ const tripPresenter = new TripPresenter(
 filtersPresenter.initialize();
 tripPresenter.initialize();
 
-const menuComponent = new MenuView();
-render(navigationElement, menuComponent);
-
-const handleNewEventClick = (evt) => {
-  evt.preventDefault();
-  statsComponent.hide();
-  menuComponent.toggleMenuItem(MenuItem.TRIP);
-  tripPresenter.showTrip();
-  tripPresenter.addEvent();
-};
-
-tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', handleNewEventClick);
-
-const handleMenuItemClick = (element) => {
+function handleMenuItemClick(element) {
   const {path} = element.dataset;
 
   switch (path) {
@@ -71,10 +64,17 @@ const handleMenuItemClick = (element) => {
     case MenuItem.STATS:
       tripPresenter.hideTrip();
       statsComponent.show();
+      statsComponent.draw(tripPresenter.exportStats());
       break;
   }
 
   menuComponent.toggleMenuItem(path);
-};
+}
 
-menuComponent.setMenuItemClickHandler(handleMenuItemClick);
+function handleNewEventClick(evt) {
+  evt.preventDefault();
+  statsComponent.hide();
+  menuComponent.toggleMenuItem(MenuItem.TRIP);
+  tripPresenter.showTrip();
+  tripPresenter.addEvent();
+}

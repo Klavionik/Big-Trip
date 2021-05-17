@@ -6,9 +6,10 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, UpdateType, ActionType, FilterType} from '../const';
+import {SortType, UpdateType, ActionType, FilterType, TYPES} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
+import {getDuration} from '../utils/dates';
 
 class Trip {
   constructor(infoContainer, tripContainer, eventsModel, filtersModel, offersModel, destinationsModel) {
@@ -58,6 +59,8 @@ class Trip {
 
   showTrip() {
     this._currentSortType = SortType.DAY;
+    this._clearEvents();
+    this._renderTrip();
     this._tripContainer.classList.remove('trip-events--hidden');
   }
 
@@ -67,6 +70,23 @@ class Trip {
     this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this._toggleNewEventButton);
     this._toggleNewEventButton();
+  }
+
+  exportStats() {
+    const events = this._eventsModel.getEvents();
+    const typesMap = Object.fromEntries(TYPES.map((type) => [type, 0]));
+
+    const moneyStats = {...typesMap};
+    const typeStats = {...typesMap};
+    const timeSpendStats = {...typesMap};
+
+    for (const event of events) {
+      moneyStats[event.type] += event.price;
+      typeStats[event.type] += 1;
+      timeSpendStats[event.type] = timeSpendStats[event.type] + getDuration(event.start, event.end);
+    }
+
+    return {moneyStats, typeStats, timeSpendStats};
   }
 
   _clearEvents(resetSortType = false) {
