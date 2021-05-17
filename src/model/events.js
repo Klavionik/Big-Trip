@@ -14,12 +14,12 @@ class Events extends Observer {
     this._events = [...events];
   }
 
-  addEvent(updateType, data) {
+  addEvent(redrawScope, data) {
     this._events = [...this._events, data];
-    this._notify(updateType, data);
+    this._notify(redrawScope, data);
   }
 
-  updateEvent(updateType, data) {
+  updateEvent(redrawScope, data) {
     const index = this._events.findIndex(({id}) => id === data.id);
 
     if (index !== -1) {
@@ -28,16 +28,16 @@ class Events extends Observer {
         data,
         ...this._events.slice(index + 1),
       ];
-      this._notify(updateType, data);
+      this._notify(redrawScope, data);
     }
   }
 
-  deleteEvent(updateType, data) {
+  deleteEvent(redrawScope, data) {
     const index = this._events.findIndex(({id}) => id === data.id);
 
     if (index !== -1) {
       this._events = [...this._events.slice(0, index), ...this._events.slice(index + 1)];
-      this._notify(updateType);
+      this._notify(redrawScope);
     }
   }
 }

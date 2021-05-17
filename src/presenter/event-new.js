@@ -1,5 +1,5 @@
 import {remove, render} from '../utils/common';
-import {ActionType, UpdateType} from '../const';
+import {ActionType, RedrawScope} from '../const';
 import {nanoid} from 'nanoid';
 import EventNewForm from '../view/event-new-form';
 import {now} from '../utils/dates';
@@ -94,7 +94,7 @@ class EventNew {
   _handleSubmit(data) {
     this._updateData(
       ActionType.ADD,
-      UpdateType.MINOR,
+      RedrawScope.LIST,
       {id: nanoid(7), ...data},
     );
     this.destroy();

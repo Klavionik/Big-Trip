@@ -6,7 +6,7 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, UpdateType, ActionType, FilterType, TYPES} from '../const';
+import {SortType, RedrawScope, ActionType, FilterType, TYPES} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 import {getDuration} from '../utils/dates';
@@ -67,7 +67,7 @@ class Trip {
   addEvent() {
     remove(this._noEventsComponent);
     this._currentSortType = SortType.DAY;
-    this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._filtersModel.setFilter(RedrawScope.PAGE, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this._toggleNewEventButton);
     this._toggleNewEventButton();
   }
@@ -191,29 +191,29 @@ class Trip {
     }
   }
 
-  _handleViewAction(actionType, updateType, data) {
+  _handleViewAction(actionType, redrawScope, data) {
     switch (actionType) {
       case ActionType.ADD:
-        this._eventsModel.addEvent(updateType, data);
+        this._eventsModel.addEvent(redrawScope, data);
         break;
       case ActionType.UPDATE:
-        this._eventsModel.updateEvent(updateType, data);
+        this._eventsModel.updateEvent(redrawScope, data);
         break;
       case ActionType.DELETE:
-        this._eventsModel.deleteEvent(updateType, data);
+        this._eventsModel.deleteEvent(redrawScope, data);
     }
   }
 
-  _handleModelEvent(updateType, data) {
-    switch (updateType) {
-      case UpdateType.PATCH:
+  _handleModelEvent(redrawScope, data) {
+    switch (redrawScope) {
+      case RedrawScope.ITEM:
         this._eventPresenters[data.id].initialize(data);
         break;
-      case UpdateType.MINOR:
+      case RedrawScope.LIST:
         this._clearEvents();
         this._renderTrip();
         break;
-      case UpdateType.MAJOR:
+      case RedrawScope.PAGE:
         this._clearEvents(true);
         this._renderTrip(true);
         break;

@@ -32,10 +32,10 @@ const ActionType = {
   DELETE: 'DELETE',
 };
 
-const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+const RedrawScope = {
+  ITEM: 'ITEM',
+  LIST: 'LIST',
+  PAGE: 'PAGE',
 };
 
 const FilterType = {
@@ -138,7 +138,7 @@ export {
   OFFERS,
   SortType,
   ActionType,
-  UpdateType,
+  RedrawScope,
   FilterType,
   MenuItem
 };
