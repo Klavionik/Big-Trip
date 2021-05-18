@@ -6,7 +6,7 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, RedrawScope, ActionType, FilterType, TYPES} from '../const';
+import {SortType, RedrawScope, ActionType, FilterType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 import {getDuration} from '../utils/dates';
@@ -74,16 +74,15 @@ class Trip {
 
   exportStats() {
     const events = this._eventsModel.getEvents();
-    const typesMap = Object.fromEntries(TYPES.map((type) => [type, 0]));
 
-    const moneyStats = {...typesMap};
-    const typeStats = {...typesMap};
-    const timeSpendStats = {...typesMap};
+    const moneyStats = {};
+    const typeStats = {};
+    const timeSpendStats = {};
 
     for (const event of events) {
-      moneyStats[event.type] += event.price;
-      typeStats[event.type] += 1;
-      timeSpendStats[event.type] = timeSpendStats[event.type] + getDuration(event.start, event.end);
+      moneyStats[event.type] = (moneyStats[event.type] || 0) + event.price;
+      typeStats[event.type] = (typeStats[event.type] || 0) + 1;
+      timeSpendStats[event.type] = (timeSpendStats[event.type] || 0) + getDuration(event.start, event.end);
     }
 
     return {moneyStats, typeStats, timeSpendStats};

@@ -1,7 +1,6 @@
 import AbstractView from './abstract-view';
 import Chart from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import {TYPES} from '../const';
 import {formatDuration} from '../utils/dates';
 
 
@@ -93,17 +92,11 @@ const _getChartOptions = ({text, labels, data, formatter}) => {
 class Stats extends AbstractView {
   constructor() {
     super();
-
     this._BAR_HEIGHT = 55;
-    this._labels = TYPES.map((type) => type.toUpperCase());
 
     this._moneyCtx = this.getElement().querySelector('.statistics__chart--money');
     this._typeCtx = this.getElement().querySelector('.statistics__chart--transport');
     this._timeSpendCtx = this.getElement().querySelector('.statistics__chart--time');
-
-    this._moneyCtx.height = this._BAR_HEIGHT * this._labels.length;
-    this._typeCtx.height = this._BAR_HEIGHT * this._labels.length;
-    this._timeSpendCtx.height = this._BAR_HEIGHT * this._labels.length;
 
     this._moneyChart = null;
     this._typeChart = null;
@@ -114,31 +107,45 @@ class Stats extends AbstractView {
     return createStatsTemplate();
   }
 
-  _drawMoneyStats(data) {
+  _drawMoneyStats({labels, data}) {
+    this._moneyCtx.height = this._BAR_HEIGHT * labels.length;
     this._moneyChart = new Chart(this._moneyCtx, _getChartOptions({
       text: 'MONEY',
-      labels: this._labels,
-      data: this._labels.map((label) => data[label.toLowerCase()]),
+      labels: labels,
+      data: data,
       formatter: (val) => `€ ${val}`,
     }));
   }
 
-  _drawTypeStats(data) {
+  _drawTypeStats({labels, data}) {
     this._typeChart = new Chart(this._typeCtx, _getChartOptions({
       text: 'TYPE',
-      labels: this._labels,
-      data: this._labels.map((label) => data[label.toLowerCase()]),
+      labels: labels,
+      data: data,
       formatter: (val) => `${val}x`,
     }));
   }
 
-  _drawTimeSpendStats(data) {
+  _drawTimeSpendStats({labels, data}) {
     this._timeSpendChart = new Chart(this._timeSpendCtx, _getChartOptions({
       text: 'TIME-SPEND',
-      labels: this._labels,
-      data: this._labels.map((label) => data[label.toLowerCase()]),
+      labels: labels,
+      data: data,
       formatter: formatDuration,
     }));
+  }
+
+  _prepareData(stats) {
+    const labels = Object.keys(stats);
+    const data = labels.map((label) => stats[label.toLowerCase()]).sort((a, b) => b - a);
+
+    return {labels, data};
+  }
+
+  _setCtxHeight(labelsCount) {
+    this._moneyCtx.height = this._BAR_HEIGHT * labelsCount;
+    this._typeCtx.height = this._BAR_HEIGHT * labelsCount;
+    this._timeSpendCtx.height = this._BAR_HEIGHT * labelsCount;
   }
 
   hide() {
@@ -161,9 +168,13 @@ class Stats extends AbstractView {
   }
 
   draw({moneyStats, typeStats, timeSpendStats}) {
-    this._drawMoneyStats(moneyStats);
-    this._drawTypeStats(typeStats);
-    this._drawTimeSpendStats(timeSpendStats);
+    // количество лейблов будет одинаковым в любом объекте, берем первый
+    const labelsCount = Object.keys(moneyStats).length;
+    this._setCtxHeight(labelsCount);
+
+    this._drawMoneyStats(this._prepareData(moneyStats));
+    this._drawTypeStats(this._prepareData(typeStats));
+    this._drawTimeSpendStats(this._prepareData(timeSpendStats));
   }
 }
 
