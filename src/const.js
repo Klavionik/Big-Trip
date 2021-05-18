@@ -32,16 +32,21 @@ const ActionType = {
   DELETE: 'DELETE',
 };
 
-const UpdateType = {
-  PATCH: 'PATCH',
-  MINOR: 'MINOR',
-  MAJOR: 'MAJOR',
+const RedrawScope = {
+  ITEM: 'ITEM',
+  LIST: 'LIST',
+  PAGE: 'PAGE',
 };
 
 const FilterType = {
   EVERYTHING: 'everything',
   FUTURE: 'future',
   PAST: 'past',
+};
+
+const MenuItem = {
+  TRIP: 'trip',
+  STATS: 'stats',
 };
 
 const OFFERS = [
@@ -133,6 +138,7 @@ export {
   OFFERS,
   SortType,
   ActionType,
-  UpdateType,
-  FilterType
+  RedrawScope,
+  FilterType,
+  MenuItem
 };

@@ -1,7 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
-import {UpdateType, ActionType} from '../const';
+import {RedrawScope, ActionType} from '../const';
 
 const Mode = {
   VIEW: 'VIEW',
@@ -120,7 +120,7 @@ class Event {
 
     this._updateData(
       ActionType.UPDATE,
-      UpdateType.PATCH,
+      RedrawScope.ITEM,
       {...this._event, ...payload},
     );
   }
@@ -128,7 +128,7 @@ class Event {
   _handleEventType(data) {
     this._updateData(
       ActionType.UPDATE,
-      UpdateType.PATCH,
+      RedrawScope.ITEM,
       {...this._event, ...data},
     );
   }
@@ -136,7 +136,7 @@ class Event {
   _handleIsFavorite() {
     this._updateData(
       ActionType.UPDATE,
-      UpdateType.PATCH,
+      RedrawScope.ITEM,
       {...this._event, isFavorite: !this._event.isFavorite},
     );
   }
@@ -144,7 +144,7 @@ class Event {
   _handleSubmit(data) {
     this._updateData(
       ActionType.UPDATE,
-      UpdateType.MINOR,
+      RedrawScope.LIST,
       {...this._event, ...data},
     );
     this._replaceFormWithItem();
@@ -153,7 +153,7 @@ class Event {
   _handleDelete(data) {
     this._updateData(
       ActionType.DELETE,
-      UpdateType.MINOR,
+      RedrawScope.LIST,
       data,
     );
   }

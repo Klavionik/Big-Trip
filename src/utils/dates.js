@@ -4,26 +4,41 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 dayjs.extend(duration);
 dayjs.extend(isSameOrAfter);
-window.dayjs = dayjs;
-
 
 const HOUR_IN_MS = 3600000;
 const DAY_IN_MS = HOUR_IN_MS * 24;
 
-const getDuration = (diff) => {
-  const duration = dayjs.duration(diff);
+const formatDuration = (duration) => {
+  const durationObj = dayjs.duration(duration);
 
-  if (diff < HOUR_IN_MS) {
-    return duration.format('mm[M]');
+  if (duration < HOUR_IN_MS) {
+    return durationObj.format('mm[M]');
   }
 
-  if (diff >= HOUR_IN_MS && diff < DAY_IN_MS) {
-    return duration.format('HH[H] mm[M]');
+  if (duration >= HOUR_IN_MS && duration < DAY_IN_MS) {
+    return durationObj.format('HH[H] mm[M]');
   }
 
-  if (diff >= DAY_IN_MS) {
-    return duration.format('DD[D] HH[H] mm[M]');
+  if (duration >= DAY_IN_MS) {
+    return durationObj.format('DD[D] HH[H] mm[M]');
   }
+};
+
+const getDiff = (start, end) => {
+  if (!(start instanceof dayjs)) {
+    start = dayjs(start);
+  }
+
+  if (!(end instanceof dayjs)) {
+    end = dayjs(end);
+  }
+
+  return end.diff(start);
+};
+
+const getDuration = (start, end) => {
+  const diff = getDiff(start, end);
+  return dayjs.duration(diff).asMilliseconds();
 };
 
 const formatTime = (date) => dayjs(date).format('HH:mm');
@@ -42,8 +57,7 @@ const processEventDate = (start, end) => {
   const endTime = formatTime(end);
   const startDate = formatDate(start);
 
-  const diff = end.diff(start);
-  const duration = getDuration(diff);
+  const duration = formatDuration(getDuration(start, end));
 
   return {
     startDate,
@@ -61,10 +75,15 @@ const isFuture = (event)  => {
   return dayjs(event.start).isSameOrAfter(now()) || dayjs(event.end).isAfter(now());
 };
 
+const makeEmptyDuration = () => dayjs.duration(0);
+
 export {
   processEventDate,
   formatInputDate,
   now,
   isFuture,
-  isPast
+  isPast,
+  getDuration,
+  formatDuration,
+  makeEmptyDuration
 };

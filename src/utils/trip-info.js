@@ -32,7 +32,7 @@ const getDates = (events) => {
   return dates;
 };
 
-const calculacteEventCost = (acc, event) => {
+const calculateEventCost = (acc, event) => {
   const offersCost = event.offers.reduce((acc, offer) => acc + offer.price, 0);
   return acc + event.price + offersCost;
 };
@@ -43,7 +43,7 @@ const calculateTripInfo = (events) => {
   return {
     route: getRoute(sortedEvents),
     dates: getDates(sortedEvents),
-    cost: sortedEvents.reduce(calculacteEventCost, 0),
+    cost: sortedEvents.reduce(calculateEventCost, 0),
   };
 };
 

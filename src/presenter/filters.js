@@ -1,7 +1,7 @@
 import FiltersView from '../view/filters.js';
 import {render, replace} from '../utils/common.js';
 import {filters} from '../utils/filters.js';
-import {FilterType, UpdateType} from '../const.js';
+import {FilterType, RedrawScope} from '../const.js';
 
 class Filters {
   constructor(filtersContainer, filtersModel, eventsModel) {
@@ -42,7 +42,7 @@ class Filters {
       return;
     }
 
-    this._filtersModel.setFilter(UpdateType.MAJOR, filterType);
+    this._filtersModel.setFilter(RedrawScope.PAGE, filterType);
   }
 
   _getFilters() {

@@ -6,9 +6,10 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, UpdateType, ActionType, FilterType} from '../const';
+import {SortType, RedrawScope, ActionType, FilterType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
+import {getDuration} from '../utils/dates';
 
 class Trip {
   constructor(infoContainer, tripContainer, eventsModel, filtersModel, offersModel, destinationsModel) {
@@ -31,13 +32,10 @@ class Trip {
     this._noEventsComponent = null;
 
     this._updateMode = this._updateMode.bind(this);
-    this._newEventClickHandler = this._newEventClickHandler.bind(this);
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
     this._toggleNewEventButton = this._toggleNewEventButton.bind(this);
-
-    this._setNewEventClickHandler();
   }
 
   initialize() {
@@ -54,11 +52,40 @@ class Trip {
     this._renderTrip();
   }
 
-  _addEvent() {
+  hideTrip() {
+    this._tripContainer.classList.add('trip-events--hidden');
+    this._eventNewPresenter.destroy();
+  }
+
+  showTrip() {
     this._currentSortType = SortType.DAY;
-    this._filtersModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+    this._clearEvents();
+    this._renderTrip();
+    this._tripContainer.classList.remove('trip-events--hidden');
+  }
+
+  addEvent() {
+    remove(this._noEventsComponent);
+    this._currentSortType = SortType.DAY;
+    this._filtersModel.setFilter(RedrawScope.PAGE, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this._toggleNewEventButton);
     this._toggleNewEventButton();
+  }
+
+  exportStats() {
+    const events = this._eventsModel.getEvents();
+
+    const moneyStats = {};
+    const typeStats = {};
+    const timeSpendStats = {};
+
+    for (const event of events) {
+      moneyStats[event.type] = (moneyStats[event.type] || 0) + event.price;
+      typeStats[event.type] = (typeStats[event.type] || 0) + 1;
+      timeSpendStats[event.type] = (timeSpendStats[event.type] || 0) + getDuration(event.start, event.end);
+    }
+
+    return {moneyStats, typeStats, timeSpendStats};
   }
 
   _clearEvents(resetSortType = false) {
@@ -155,17 +182,6 @@ class Trip {
       .forEach((presenter) => presenter.resetView());
   }
 
-  _setNewEventClickHandler() {
-    this._infoContainer.querySelector('.trip-main__event-add-btn')
-      .addEventListener('click', this._newEventClickHandler);
-  }
-
-  _newEventClickHandler(evt) {
-    evt.preventDefault();
-    remove(this._noEventsComponent);
-    this._addEvent();
-  }
-
   _handleSortTypeChanged(sortType) {
     if (sortType !== this._currentSortType) {
       this._currentSortType = sortType;
@@ -174,29 +190,29 @@ class Trip {
     }
   }
 
-  _handleViewAction(actionType, updateType, data) {
+  _handleViewAction(actionType, redrawScope, data) {
     switch (actionType) {
       case ActionType.ADD:
-        this._eventsModel.addEvent(updateType, data);
+        this._eventsModel.addEvent(redrawScope, data);
         break;
       case ActionType.UPDATE:
-        this._eventsModel.updateEvent(updateType, data);
+        this._eventsModel.updateEvent(redrawScope, data);
         break;
       case ActionType.DELETE:
-        this._eventsModel.deleteEvent(updateType, data);
+        this._eventsModel.deleteEvent(redrawScope, data);
     }
   }
 
-  _handleModelEvent(updateType, data) {
-    switch (updateType) {
-      case UpdateType.PATCH:
+  _handleModelEvent(redrawScope, data) {
+    switch (redrawScope) {
+      case RedrawScope.ITEM:
         this._eventPresenters[data.id].initialize(data);
         break;
-      case UpdateType.MINOR:
+      case RedrawScope.LIST:
         this._clearEvents();
         this._renderTrip();
         break;
-      case UpdateType.MAJOR:
+      case RedrawScope.PAGE:
         this._clearEvents(true);
         this._renderTrip(true);
         break;
