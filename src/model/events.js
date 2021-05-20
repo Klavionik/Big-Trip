@@ -10,8 +10,9 @@ class Events extends Observer {
     return this._events;
   }
 
-  setEvents(events) {
+  setEvents(redrawScope, events) {
     this._events = [...events];
+    this._notify(redrawScope);
   }
 
   addEvent(redrawScope, data) {

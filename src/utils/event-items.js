@@ -1,9 +1,5 @@
-import {OFFERS, TYPES} from '../const';
+import {TYPES} from '../const';
 import {compareByTitle} from './compare';
-
-const getOffersForType = (eventType) => {
-  return [...OFFERS.find(({type}) => type === eventType).offers];
-};
 
 const filterNotSelectedOffers = (eventOffers, offersForType) => {
   const notSelected = [];
@@ -83,6 +79,5 @@ export {
   createEventTypesTemplate,
   createDestinationListTemplate,
   createOffersTemplate,
-  createDescriptionTemplate,
-  getOffersForType
+  createDescriptionTemplate
 };

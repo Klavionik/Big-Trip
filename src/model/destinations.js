@@ -19,6 +19,24 @@ class Destinations extends Observer {
     this._destinations = [...destinations];
   }
 
+  static convertFromServer(destination) {
+    return {
+      destination: destination.name,
+      description: {
+        text: destination.description,
+        photos: destination.pictures,
+      },
+    };
+  }
+
+  static convertToServer(destination) {
+    return {
+      name: destination.destination,
+      description: destination.description.text,
+      pictures: destination.description.photos,
+    };
+  }
+
 }
 
 export default Destinations;

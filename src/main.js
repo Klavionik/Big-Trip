@@ -1,4 +1,3 @@
-import {generateEventItem, generateDestinations} from './mock/event-item';
 import MenuView from './view/menu';
 import StatsView from './view/stats';
 import {render} from './utils/common';
@@ -8,11 +7,10 @@ import FiltersModel from './model/filters';
 import FiltersPresenter from './presenter/filters';
 import OffersModel from './model/offers';
 import DestinationsModel from './model/destinations';
-import {OFFERS, MenuItem} from './const';
+import {MenuItem, RedrawScope, API_URL, TOKEN, ERROR_MSG, ERROR_ATTR} from './const';
+import API from './api';
 
-const EVENT_ITEMS_COUNT = 10;
-const events = new Array(EVENT_ITEMS_COUNT).fill().map(generateEventItem);
-const destinations = generateDestinations();
+const api = new API(API_URL, TOKEN);
 
 const navigationElement = document.querySelector('.trip-controls__navigation');
 const filtersElement = document.querySelector('.trip-controls__filters');
@@ -25,18 +23,10 @@ render(tripEventsElement, statsComponent, 'afterend');
 
 const menuComponent = new MenuView();
 render(navigationElement, menuComponent);
-menuComponent.setMenuItemClickHandler(handleMenuItemClick);
-
-tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', handleNewEventClick);
 
 const eventsModel = new EventsModel();
-eventsModel.setEvents(events);
-
 const offersModel = new OffersModel();
-offersModel.setOffers(OFFERS);
-
 const destinationsModel = new DestinationsModel();
-destinationsModel.setDestinations(destinations);
 
 const filtersModel = new FiltersModel();
 const filtersPresenter = new FiltersPresenter(filtersElement, filtersModel, eventsModel);
@@ -48,10 +38,31 @@ const tripPresenter = new TripPresenter(
   filtersModel,
   offersModel,
   destinationsModel,
+  api,
 );
 
 filtersPresenter.initialize();
 tripPresenter.initialize();
+
+api.getEvents()
+  .then((events) => events.map(EventsModel.convertFromServer))
+  .then((events) => {
+    eventsModel.setEvents(RedrawScope.INIT, events);
+    setMenuHandlers();
+  })
+  .catch(() => {
+    eventsModel.setEvents(RedrawScope.INIT, []);
+    setMenuHandlers();
+  });
+
+api.getDestinations()
+  .then((destinations) => destinations.map(DestinationsModel.convertFromServer))
+  .then((destinations) => destinationsModel.setDestinations(destinations))
+  .catch(setErrorOverlay);
+
+api.getOffers()
+  .then((offers) => offersModel.setOffers(offers))
+  .catch(setErrorOverlay);
 
 function handleMenuItemClick(element) {
   const {path} = element.dataset;
@@ -78,3 +89,14 @@ function handleNewEventClick(evt) {
   tripPresenter.showTrip();
   tripPresenter.addEvent();
 }
+
+function setMenuHandlers() {
+  menuComponent.setMenuItemClickHandler(handleMenuItemClick);
+  tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', handleNewEventClick);
+}
+
+function setErrorOverlay() {
+  document.body.setAttribute(ERROR_ATTR, ERROR_MSG);
+  document.body.classList.add('error-overlay');
+}
+
