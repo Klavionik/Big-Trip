@@ -49,6 +49,13 @@ const MenuItem = {
   STATS: 'stats',
 };
 
+const HttpMethod = {
+  GET: 'GET',
+  POST: 'POST',
+  PUT: 'PUT',
+  DELETE: 'DELETE',
+};
+
 const OFFERS = [
   {
     'type': 'taxi',
@@ -140,5 +147,6 @@ export {
   ActionType,
   RedrawScope,
   FilterType,
-  MenuItem
+  MenuItem,
+  HttpMethod
 };
