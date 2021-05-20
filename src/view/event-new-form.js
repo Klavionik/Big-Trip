@@ -9,7 +9,7 @@ import flatpickr from 'flatpickr';
 import SmartView from './smart-view';
 
 const createPhotosTemplate = (description) => {
-  const addPhoto = (photo) => `<img class="event__photo" src="${photo}" alt="Event photo">`;
+  const addPhoto = (photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`;
 
   return description
     ? `<div class="event__photos-container">

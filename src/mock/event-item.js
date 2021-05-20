@@ -42,7 +42,7 @@ const getRandomDestination = () => {
 
 const getRandomPhotos = (photosCount) => {
   const createPhotoLink = (integer) => {
-    return `http://picsum.photos/248/152?r=${integer}`;
+    return {src: `http://picsum.photos/248/152?r=${integer}`, description: getRandomElement(LOREM)};
   };
 
   return new Array(photosCount).fill().map(() => createPhotoLink(getRandomInteger(0, 100)));
