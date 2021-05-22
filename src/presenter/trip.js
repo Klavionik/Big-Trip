@@ -10,12 +10,16 @@ import {SortType, RedrawScope, ActionType, FilterType} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 import {getDuration} from '../utils/dates';
+import LoadingView from '../view/loading';
+import EventsModel from '../model/events';
 
 class Trip {
-  constructor(infoContainer, tripContainer, eventsModel, filtersModel, offersModel, destinationsModel) {
+  constructor(infoContainer, tripContainer, eventsModel, filtersModel, offersModel, destinationsModel, api) {
     this._infoContainer = infoContainer;
     this._tripContainer = tripContainer;
 
+    this._api = api;
+    this._isLoading = true;
     this._filtersModel = filtersModel;
     this._offersModel = offersModel;
     this._destinationsModel = destinationsModel;
@@ -24,6 +28,7 @@ class Trip {
     this._eventPresenters = {};
 
     this._eventListComponent = new EventListView();
+    this._loadingComponent = new LoadingView();
 
     this._sortingComponent = null;
     this._currentSortType = SortType.DAY;
@@ -123,6 +128,11 @@ class Trip {
   }
 
   _renderTrip(keepTripInfo = false) {
+    if (this._isLoading) {
+      this._renderLoading();
+      return;
+    }
+
     if (!keepTripInfo) {
       this._renderTripInfo(this._eventsModel.getEvents());
     }
@@ -147,6 +157,10 @@ class Trip {
       this._tripInfoComponent = new TripInfoView(calculateTripInfo(events));
       render(this._infoContainer, this._tripInfoComponent, 'afterbegin');
     }
+  }
+
+  _renderLoading() {
+    render(this._eventListComponent, this._loadingComponent);
   }
 
   _renderEvent(event) {
@@ -196,7 +210,9 @@ class Trip {
         this._eventsModel.addEvent(redrawScope, data);
         break;
       case ActionType.UPDATE:
-        this._eventsModel.updateEvent(redrawScope, data);
+        this._api.updateEvent(EventsModel.convertToServer(data))
+          .then(EventsModel.convertFromServer)
+          .then((data) => this._eventsModel.updateEvent(redrawScope, data));
         break;
       case ActionType.DELETE:
         this._eventsModel.deleteEvent(redrawScope, data);
@@ -215,6 +231,11 @@ class Trip {
       case RedrawScope.PAGE:
         this._clearEvents(true);
         this._renderTrip(true);
+        break;
+      case RedrawScope.INIT:
+        this._isLoading = false;
+        remove(this._loadingComponent);
+        this._renderTrip();
         break;
     }
   }
