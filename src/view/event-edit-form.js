@@ -9,7 +9,7 @@ import SmartView from './smart-view';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
 
-const createEventEditFormTemplate = (event, availableOffers, availableDestinations) => {
+const createEventEditFormTemplate = (event, eventTypeOffers, availableDestinations) => {
   const {
     type,
     destination,
@@ -73,7 +73,7 @@ const createEventEditFormTemplate = (event, availableOffers, availableDestinatio
                   </button>
                 </header>
                 <section class="event__details">
-                    ${createOffersTemplate(offers, availableOffers)}
+                    ${createOffersTemplate(offers, eventTypeOffers)}
                     ${createDescriptionTemplate(description)}
                 </section>
               </form>`;
@@ -103,7 +103,7 @@ class EventEditForm extends SmartView {
   }
 
   getTemplate() {
-    return createEventEditFormTemplate(this._data, this._availableOffers, this._availableDestinations);
+    return createEventEditFormTemplate(this._data, this._getOffersForEventType(), this._availableDestinations);
   }
 
   restoreHandlers() {
@@ -113,7 +113,6 @@ class EventEditForm extends SmartView {
     this.setSubmitHandler(this._callbacks.submit);
     this.setDeleteClickHandler(this._callbacks.delete);
     this.setRollupClickHandler(this._callbacks.rollupClick);
-    this.setEventTypeClickHandler(this._callbacks.eventType);
     this.setDestinationChangeHandler(this._callbacks.destinationChange);
   }
 
@@ -131,8 +130,7 @@ class EventEditForm extends SmartView {
     this.getElement().addEventListener('submit', this._submitHandler);
   }
 
-  setEventTypeClickHandler(cb) {
-    this._callbacks.eventType = cb;
+  _setEventTypeClickHandler() {
     const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
 
     eventTypeElements.forEach((element) => {
@@ -156,6 +154,10 @@ class EventEditForm extends SmartView {
       this._datepickerEnd.destroy();
       this._datepickerEnd = null;
     }
+  }
+
+  _getOffersForEventType() {
+    return [...this._availableOffers.find(((offer) => offer.type === this._data.type)).offers];
   }
 
   _setPriceInputHandler() {
@@ -202,13 +204,14 @@ class EventEditForm extends SmartView {
   }
 
   _setInnerHandlers() {
+    this._setEventTypeClickHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
   }
 
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
-    this._callbacks.eventType({type: evt.target.value, offers: []});
+    this.updateData({type: evt.target.value, offers: []});
   }
 
   _eventOfferClickHandler(evt) {

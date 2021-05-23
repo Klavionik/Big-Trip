@@ -17,7 +17,6 @@ class EventNew {
     this._closeOnEscape = this._closeOnEscape.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancel = this._handleCancel.bind(this);
-    this._handleEventTypeChange = this._handleEventTypeChange.bind(this);
     this._handleDestinationChange = this._handleDestinationChange.bind(this);
   }
 
@@ -28,7 +27,7 @@ class EventNew {
       event = this._getDefaultEvent();
     }
 
-    const availableOffers = this._offersModel.getOffers(event.type);
+    const availableOffers = this._offersModel.getOffers();
     const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventNewForm = new EventNewForm(event, availableOffers, availableDestinations);
@@ -70,21 +69,12 @@ class EventNew {
   _setEventNewFormHandlers() {
     this._eventNewForm.setSubmitHandler(this._handleSubmit);
     this._eventNewForm.setCancelClickHandler(this._handleCancel);
-    this._eventNewForm.setEventTypeClickHandler(this._handleEventTypeChange);
     this._eventNewForm.setDestinationChangeHandler(this._handleDestinationChange);
   }
 
   _handleDestinationChange(data) {
-    this._eventNewForm.destroyDatepickers();
-    remove(this._eventNewForm);
-    const newDescription = this._destinationsModel.getDescription(data.destination);
-    this.initialize(this._cancelCallback, {...data, description: newDescription});
-  }
-
-  _handleEventTypeChange(data) {
-    this._eventNewForm.destroyDatepickers();
-    remove(this._eventNewForm);
-    this.initialize(this._cancelCallback, data);
+    const description = this._destinationsModel.getDescription(data.destination);
+    this._eventNewForm.updateData({...data, description: description});
   }
 
   _closeOnEscape(evt) {

@@ -6,8 +6,8 @@ class Offers extends Observer {
     this._offers = [];
   }
 
-  getOffers(type) {
-    return [...this._offers.find(((offer) => offer.type === type)).offers];
+  getOffers() {
+    return [...this._offers];
   }
 
   setOffers(offers) {

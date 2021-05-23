@@ -27,7 +27,7 @@ const createDescriptionTemplate = (description) => {
     : '';
 };
 
-const createOffersTemplate = (eventOffers, offersForType) => {
+const createOffersTemplate = (eventOffers, eventTypeOffers) => {
   const addOffers = (offers) => {
     return offers.map(({title, price, checked}) => {
       const name = generateInputNameFromTitle(title);
@@ -42,7 +42,7 @@ const createOffersTemplate = (eventOffers, offersForType) => {
     }).join('');
   };
 
-  const notSelectedOffers = filterNotSelectedOffers(eventOffers, offersForType);
+  const notSelectedOffers = filterNotSelectedOffers(eventOffers, eventTypeOffers);
   const allOffers = [
     ...eventOffers.map((value) => { return {...value, checked: true}; }),
     ...notSelectedOffers.map((value) => { return {...value, checked: false}; }),

@@ -1,7 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
-import {RedrawScope, ActionType} from '../const';
+import {ActionType, RedrawScope} from '../const';
 
 const Mode = {
   VIEW: 'VIEW',
@@ -26,7 +26,6 @@ class Event {
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
-    this._handleEventType = this._handleEventType.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
@@ -39,11 +38,11 @@ class Event {
     const previousEventItem = this._eventItem;
     const previousEventEditForm = this._eventEditForm;
 
-    const availableOffers = this._offersModel.getOffers(event.type);
+    const offers = this._offersModel.getOffers();
     const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event, availableOffers, availableDestinations);
+    this._eventEditForm = new EventEditForm(event, offers, availableDestinations);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -107,7 +106,6 @@ class Event {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
-    this._eventEditForm.setEventTypeClickHandler(this._handleEventType);
     this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
   }
 
@@ -116,23 +114,8 @@ class Event {
       return;
     }
 
-    const newDescription = this._destinationsModel.getDescription(data.destination);
-
-    const payload = {...data, description: newDescription};
-
-    this._updateData(
-      ActionType.UPDATE,
-      RedrawScope.ITEM,
-      {...this._event, ...payload},
-    );
-  }
-
-  _handleEventType(data) {
-    this._updateData(
-      ActionType.UPDATE,
-      RedrawScope.ITEM,
-      {...this._event, ...data},
-    );
+    const description = this._destinationsModel.getDescription(data.destination);
+    this._eventEditForm.updateData({...data, description: description});
   }
 
   _handleIsFavorite() {

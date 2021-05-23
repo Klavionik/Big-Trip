@@ -18,7 +18,7 @@ const createPhotosTemplate = (description) => {
     : '';
 };
 
-const createEventNewFormTemplate = (event, availableOffers, availableDestinations) => {
+const createEventNewFormTemplate = (event, eventTypeOffers, availableDestinations) => {
   const {
     type,
     destination,
@@ -79,7 +79,7 @@ const createEventNewFormTemplate = (event, availableOffers, availableDestination
                   <button class="event__reset-btn" type="reset">Cancel</button>
                 </header>
                 <section class="event__details">
-                  ${createOffersTemplate(offers, availableOffers)}
+                  ${createOffersTemplate(offers, eventTypeOffers)}
                   ${createDescriptionTemplate(description)}
                   ${createPhotosTemplate(description)}
                 </section>
@@ -110,7 +110,7 @@ class EventNewForm extends SmartView {
   }
 
   getTemplate() {
-    return createEventNewFormTemplate(this._data, this._availableOffers, this._availableDestinations);
+    return createEventNewFormTemplate(this._data, this._getOffersForEventType(), this._availableDestinations);
   }
 
   restoreHandlers() {
@@ -119,7 +119,6 @@ class EventNewForm extends SmartView {
     this.setDatepickers();
     this.setSubmitHandler(this._callbacks.submit);
     this.setCancelClickHandler(this._callbacks.cancel);
-    this.setEventTypeClickHandler(this._callbacks.eventType);
   }
 
   reset(event) {
@@ -136,14 +135,16 @@ class EventNewForm extends SmartView {
     this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelHandler);
   }
 
+  _getOffersForEventType() {
+    return [...this._availableOffers.find(((offer) => offer.type === this._data.type)).offers];
+  }
+
   _setPriceInputHandler() {
     const priceInputElement = this.getElement().querySelector('.event__input--price');
     priceInputElement.addEventListener('input', this._priceInputHandler);
   }
 
-  setEventTypeClickHandler(cb) {
-    this._callbacks.eventType = cb;
-
+  _setEventTypeClickHandler() {
     const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
 
     eventTypeElements.forEach((element) => {
@@ -209,6 +210,7 @@ class EventNewForm extends SmartView {
   }
 
   _setInnerHandlers() {
+    this._setEventTypeClickHandler();
     this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
@@ -217,7 +219,6 @@ class EventNewForm extends SmartView {
   _eventTypeClickHandler(evt) {
     evt.preventDefault();
     this.updateData({type: evt.target.value, offers: []});
-    this._callbacks.eventType(this._data);
   }
 
   _eventOfferClickHandler(evt) {
