@@ -49,6 +49,7 @@ class EventNew {
     }
 
     remove(this._eventNewForm);
+    this._eventNewForm.destroyDatepickers();
     this._eventNewForm = null;
 
     document.removeEventListener('keydown', this._closeOnEscape);
@@ -74,12 +75,14 @@ class EventNew {
   }
 
   _handleDestinationChange(data) {
+    this._eventNewForm.destroyDatepickers();
     remove(this._eventNewForm);
     const newDescription = this._destinationsModel.getDescription(data.destination);
     this.initialize(this._cancelCallback, {...data, description: newDescription});
   }
 
   _handleEventTypeChange(data) {
+    this._eventNewForm.destroyDatepickers();
     remove(this._eventNewForm);
     this.initialize(this._cancelCallback, data);
   }

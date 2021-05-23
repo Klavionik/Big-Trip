@@ -106,7 +106,7 @@ class EventNewForm extends SmartView {
     this._cancelHandler = this._cancelHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepickers();
+    this.setDatepickers();
   }
 
   getTemplate() {
@@ -115,8 +115,8 @@ class EventNewForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this._setDatepickers();
 
+    this.setDatepickers();
     this.setSubmitHandler(this._callbacks.submit);
     this.setCancelClickHandler(this._callbacks.cancel);
     this.setEventTypeClickHandler(this._callbacks.eventType);
@@ -177,8 +177,8 @@ class EventNewForm extends SmartView {
     );
   }
 
-  _setDatepickers() {
-    this._destroyDatepickers();
+  setDatepickers() {
+    this.destroyDatepickers();
     this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
     this._datepickerEnd = this._createDatepicker(
       '#event-end-time-1',
@@ -190,7 +190,7 @@ class EventNewForm extends SmartView {
     );
   }
 
-  _destroyDatepickers() {
+  destroyDatepickers() {
     if (this._datepickerStart) {
       this._datepickerStart.destroy();
       this._datepickerStart = null;
@@ -281,14 +281,14 @@ class EventNewForm extends SmartView {
     }
 
     this.updateData(payload, false);
-    this._setDatepickers();
+    this.setDatepickers();
   }
 
   _dateEndChangeHandler([date]) {
     this.updateData({
       end: date.toISOString(),
     }, false);
-    this._setDatepickers();
+    this.setDatepickers();
   }
 
   _cancelHandler(evt) {

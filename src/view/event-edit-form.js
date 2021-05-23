@@ -100,7 +100,6 @@ class EventEditForm extends SmartView {
     this._deleteHandler = this._deleteHandler.bind(this);
 
     this._setInnerHandlers();
-    this._setDatepickers();
   }
 
   getTemplate() {
@@ -109,8 +108,8 @@ class EventEditForm extends SmartView {
 
   restoreHandlers() {
     this._setInnerHandlers();
-    this._setDatepickers();
 
+    this.setDatepickers();
     this.setSubmitHandler(this._callbacks.submit);
     this.setDeleteClickHandler(this._callbacks.delete);
     this.setRollupClickHandler(this._callbacks.rollupClick);
@@ -147,7 +146,7 @@ class EventEditForm extends SmartView {
     element.addEventListener('change', this._destinationChangeHandler);
   }
 
-  _destroyDatepickers() {
+  destroyDatepickers() {
     if (this._datepickerStart) {
       this._datepickerStart.destroy();
       this._datepickerStart = null;
@@ -189,8 +188,8 @@ class EventEditForm extends SmartView {
     );
   }
 
-  _setDatepickers() {
-    this._destroyDatepickers();
+  setDatepickers() {
+    this.destroyDatepickers();
     this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
     this._datepickerEnd = this._createDatepicker(
       '#event-end-time-1',
@@ -279,14 +278,14 @@ class EventEditForm extends SmartView {
     }
 
     this.updateData(payload, false);
-    this._setDatepickers();
+    this.setDatepickers();
   }
 
   _dateEndChangeHandler([date]) {
     this.updateData({
       end: date.toISOString(),
     }, false);
-    this._setDatepickers();
+    this.setDatepickers();
   }
 
   _deleteHandler(evt) {

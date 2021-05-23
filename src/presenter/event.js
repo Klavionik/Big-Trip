@@ -81,6 +81,7 @@ class Event {
     document.addEventListener('keydown', this._closeOnEscape);
     this._updateMode();
     this._mode = Mode.EDIT;
+    this._eventEditForm.setDatepickers();
   }
 
   _replaceFormWithItem() {
@@ -88,6 +89,7 @@ class Event {
     replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
     this._mode = Mode.VIEW;
+    this._eventEditForm.destroyDatepickers();
   }
 
   _closeOnEscape(evt) {
