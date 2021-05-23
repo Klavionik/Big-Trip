@@ -219,7 +219,7 @@ class EventNewForm extends SmartView {
       this._dateEndChangeHandler,
       {
         minDate: formatInputDate(this._data.start),
-        defaultDate: this._data.end,
+        defaultDate: formatInputDate(this._data.end),
       },
     );
   }
