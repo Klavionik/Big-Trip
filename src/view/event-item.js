@@ -86,9 +86,13 @@ class EventItem extends AbstractView {
   _isFavoriteClickHandler(evt) {
     evt.preventDefault();
 
-    if (typeof this._callbacks.rollupClick === 'function') {
+    if (typeof this._callbacks.isFavoriteClick === 'function') {
       this._callbacks.isFavoriteClick();
     }
+  }
+
+  setAborted() {
+    this.shake(() => {});
   }
 
   setRollupClickHandler(cb) {

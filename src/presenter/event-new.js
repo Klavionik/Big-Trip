@@ -1,6 +1,5 @@
 import {remove, render} from '../utils/common';
 import {ActionType, RedrawScope} from '../const';
-import {nanoid} from 'nanoid';
 import EventNewForm from '../view/event-new-form';
 import {now} from '../utils/dates';
 
@@ -54,6 +53,14 @@ class EventNew {
     document.removeEventListener('keydown', this._closeOnEscape);
   }
 
+  setViewSaving() {
+    this._eventNewForm.setSaving();
+  }
+
+  setViewAborted() {
+    this._eventNewForm.setAborted();
+  }
+
   _getDefaultEvent() {
     return {
       type: 'flight',
@@ -88,9 +95,8 @@ class EventNew {
     this._updateData(
       ActionType.ADD,
       RedrawScope.LIST,
-      {id: nanoid(7), ...data},
+      {...data, isFavorite: false},
     );
-    this.destroy();
   }
 
   _handleCancel() {

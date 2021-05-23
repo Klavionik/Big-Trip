@@ -27,12 +27,12 @@ const createDescriptionTemplate = (description) => {
     : '';
 };
 
-const createOffersTemplate = (eventOffers, eventTypeOffers) => {
+const createOffersTemplate = (eventOffers, eventTypeOffers, disabled) => {
   const addOffers = (offers) => {
     return offers.map(({title, price, checked}) => {
       const name = generateInputNameFromTitle(title);
       return `<div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="${name}-1" type="checkbox" name="${name}" ${checked ? 'checked' : ''}>
+              <input class="event__offer-checkbox  visually-hidden" id="${name}-1" type="checkbox" name="${name}" ${checked ? 'checked' : ''} ${disabled}>
               <label class="event__offer-label" for="${name}-1">
                 <span class="event__offer-title">${title}</span>
                 &plus;&euro;&nbsp;

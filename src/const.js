@@ -53,6 +53,17 @@ const HttpMethod = {
   DELETE: 'DELETE',
 };
 
+const State = {
+  SAVING: 'SAVING',
+  DELETING: 'DELETING',
+  ABORTED: 'ABORTED',
+};
+
+const Mode = {
+  VIEW: 'VIEW',
+  EDIT: 'EDIT',
+};
+
 
 export {
   TYPES,
@@ -65,5 +76,7 @@ export {
   API_URL,
   TOKEN,
   ERROR_ATTR,
-  ERROR_MSG
+  ERROR_MSG,
+  State,
+  Mode
 };

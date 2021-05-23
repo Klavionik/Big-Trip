@@ -1,12 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
-import {ActionType, RedrawScope} from '../const';
-
-const Mode = {
-  VIEW: 'VIEW',
-  EDIT: 'EDIT',
-};
+import {RedrawScope, ActionType, State, Mode} from '../const';
 
 class Event {
   constructor(eventList, updateData, updateMode, offersModel, destinationsModel) {
@@ -71,8 +66,24 @@ class Event {
   }
 
   destroy() {
+    this._eventEditForm.destroyDatepickers();
     remove(this._eventItem);
     remove(this._eventEditForm);
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._eventEditForm.setSaving();
+        break;
+      case State.DELETING:
+        this._eventEditForm.setDeleting();
+        break;
+      case State.ABORTED:
+        this._eventItem.setAborted();
+        this._eventEditForm.setAborted();
+        break;
+    }
   }
 
   _replaceItemWithForm() {
@@ -132,7 +143,6 @@ class Event {
       RedrawScope.LIST,
       {...this._event, ...data},
     );
-    this._replaceFormWithItem();
   }
 
   _handleDelete(data) {
