@@ -87,7 +87,7 @@ const createEventNewFormTemplate = (
                   <button class="event__reset-btn" type="reset" ${disabled}>Cancel</button>
                 </header>
                 <section class="event__details">
-                  ${createOffersTemplate(offers, eventTypeOffers)}
+                  ${createOffersTemplate(offers, eventTypeOffers, disabled)}
                   ${createDescriptionTemplate(description)}
                   ${createPhotosTemplate(description)}
                 </section>

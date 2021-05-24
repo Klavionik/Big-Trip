@@ -44,25 +44,29 @@ const tripPresenter = new TripPresenter(
 filtersPresenter.initialize();
 tripPresenter.initialize();
 
-api.getEvents()
-  .then((events) => events.map(EventsModel.convertFromServer))
-  .then((events) => {
+loadData();
+
+async function loadData() {
+  try {
+    const offers = await api.getOffers();
+    const destinations = await api.getDestinations();
+    offersModel.setOffers(offers);
+    destinationsModel.setDestinations(destinations.map(DestinationsModel.convertFromServer));
+  } catch (error) {
+    setErrorOverlay();
+    return;
+  }
+
+  try {
+    const events = await api.getEvents();
+    eventsModel.setEvents(RedrawScope.INIT, events.map(EventsModel.convertFromServer));
+  } catch (error) {
+    const events = [];
     eventsModel.setEvents(RedrawScope.INIT, events);
+  } finally {
     setMenuHandlers();
-  })
-  .catch(() => {
-    eventsModel.setEvents(RedrawScope.INIT, []);
-    setMenuHandlers();
-  });
-
-api.getDestinations()
-  .then((destinations) => destinations.map(DestinationsModel.convertFromServer))
-  .then((destinations) => destinationsModel.setDestinations(destinations))
-  .catch(setErrorOverlay);
-
-api.getOffers()
-  .then((offers) => offersModel.setOffers(offers))
-  .catch(setErrorOverlay);
+  }
+}
 
 function handleMenuItemClick(element) {
   const {path} = element.dataset;

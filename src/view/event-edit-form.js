@@ -82,7 +82,7 @@ const createEventEditFormTemplate = (
                   </button>
                 </header>
                 <section class="event__details">
-                    ${createOffersTemplate(offers, eventTypeOffers)}
+                    ${createOffersTemplate(offers, eventTypeOffers, disabled)}
                     ${createDescriptionTemplate(description)}
                 </section>
               </form>`;
