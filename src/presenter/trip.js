@@ -6,7 +6,7 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, RedrawScope, ActionType, FilterType} from '../const';
+import {SortType, RedrawScope, ActionType, FilterType, State} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 import {getDuration} from '../utils/dates';
@@ -207,15 +207,24 @@ class Trip {
   _handleViewAction(actionType, redrawScope, data) {
     switch (actionType) {
       case ActionType.ADD:
-        this._eventsModel.addEvent(redrawScope, data);
+        this._eventNewPresenter.setViewSaving();
+        this._api.createEvent(EventsModel.convertToServer(data))
+          .then(EventsModel.convertFromServer)
+          .then((data) => this._eventsModel.addEvent(redrawScope, data))
+          .catch(() => this._eventNewPresenter.setViewAborted());
         break;
       case ActionType.UPDATE:
+        this._eventPresenters[data.id].setViewState(State.SAVING);
         this._api.updateEvent(EventsModel.convertToServer(data))
           .then(EventsModel.convertFromServer)
-          .then((data) => this._eventsModel.updateEvent(redrawScope, data));
+          .then((data) => this._eventsModel.updateEvent(redrawScope, data))
+          .catch(() =>  this._eventPresenters[data.id].setViewState(State.ABORTED));
         break;
       case ActionType.DELETE:
-        this._eventsModel.deleteEvent(redrawScope, data);
+        this._eventPresenters[data.id].setViewState(State.DELETING);
+        this._api.deleteEvent(data)
+          .then(() => this._eventsModel.deleteEvent(redrawScope, data))
+          .catch(() => this._eventPresenters[data.id].setViewState(State.ABORTED));
     }
   }
 

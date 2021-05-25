@@ -1,12 +1,7 @@
 import EventItem from '../view/event-item';
 import EventEditForm from '../view/event-edit-form';
 import {remove, render, replace} from '../utils/common';
-import {RedrawScope, ActionType} from '../const';
-
-const Mode = {
-  VIEW: 'VIEW',
-  EDIT: 'EDIT',
-};
+import {RedrawScope, ActionType, State, Mode} from '../const';
 
 class Event {
   constructor(eventList, updateData, updateMode, offersModel, destinationsModel) {
@@ -26,7 +21,6 @@ class Event {
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._closeOnEscape = this._closeOnEscape.bind(this);
-    this._handleEventType = this._handleEventType.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
@@ -39,11 +33,11 @@ class Event {
     const previousEventItem = this._eventItem;
     const previousEventEditForm = this._eventEditForm;
 
-    const availableOffers = this._offersModel.getOffers(event.type);
+    const offers = this._offersModel.getOffers();
     const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventItem = new EventItem(event);
-    this._eventEditForm = new EventEditForm(event, availableOffers, availableDestinations);
+    this._eventEditForm = new EventEditForm(event, offers, availableDestinations);
 
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
@@ -72,8 +66,24 @@ class Event {
   }
 
   destroy() {
+    this._eventEditForm.destroyDatepickers();
     remove(this._eventItem);
     remove(this._eventEditForm);
+  }
+
+  setViewState(state) {
+    switch (state) {
+      case State.SAVING:
+        this._eventEditForm.setSaving();
+        break;
+      case State.DELETING:
+        this._eventEditForm.setDeleting();
+        break;
+      case State.ABORTED:
+        this._eventItem.setAborted();
+        this._eventEditForm.setAborted();
+        break;
+    }
   }
 
   _replaceItemWithForm() {
@@ -81,6 +91,7 @@ class Event {
     document.addEventListener('keydown', this._closeOnEscape);
     this._updateMode();
     this._mode = Mode.EDIT;
+    this._eventEditForm.setDatepickers();
   }
 
   _replaceFormWithItem() {
@@ -88,6 +99,7 @@ class Event {
     replace(this._eventEditForm, this._eventItem);
     document.removeEventListener('keydown', this._closeOnEscape);
     this._mode = Mode.VIEW;
+    this._eventEditForm.destroyDatepickers();
   }
 
   _closeOnEscape(evt) {
@@ -105,7 +117,6 @@ class Event {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
-    this._eventEditForm.setEventTypeClickHandler(this._handleEventType);
     this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
   }
 
@@ -114,23 +125,8 @@ class Event {
       return;
     }
 
-    const newDescription = this._destinationsModel.getDescription(data.destination);
-
-    const payload = {...data, description: newDescription};
-
-    this._updateData(
-      ActionType.UPDATE,
-      RedrawScope.ITEM,
-      {...this._event, ...payload},
-    );
-  }
-
-  _handleEventType(data) {
-    this._updateData(
-      ActionType.UPDATE,
-      RedrawScope.ITEM,
-      {...this._event, ...data},
-    );
+    const description = this._destinationsModel.getDescription(data.destination);
+    this._eventEditForm.updateData({...data, description: description});
   }
 
   _handleIsFavorite() {
@@ -147,7 +143,6 @@ class Event {
       RedrawScope.LIST,
       {...this._event, ...data},
     );
-    this._replaceFormWithItem();
   }
 
   _handleDelete(data) {
