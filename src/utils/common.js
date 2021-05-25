@@ -34,4 +34,8 @@ const remove = (component) => {
   component.removeElement();
 };
 
-export {createElement, render, replace, remove};
+const isOnline = () => {
+  return navigator.onLine;
+};
+
+export {createElement, render, replace, remove, isOnline};

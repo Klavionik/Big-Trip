@@ -1,16 +1,19 @@
 import MenuView from './view/menu';
 import StatsView from './view/stats';
-import {render} from './utils/common';
+import {isOnline, remove, render} from './utils/common';
 import TripPresenter from './presenter/trip';
 import EventsModel from './model/events';
 import FiltersModel from './model/filters';
 import FiltersPresenter from './presenter/filters';
 import OffersModel from './model/offers';
 import DestinationsModel from './model/destinations';
-import {MenuItem, RedrawScope, API_URL, TOKEN, ERROR_MSG, ERROR_ATTR} from './const';
-import API from './api';
+import {MenuItem, RedrawScope, API_URL, TOKEN, ERROR_MSG, ERROR_ATTR, STORE_NAME} from './const';
+import API from './api/api';
+import Provider from './api/provider';
+import Store from './api/store';
+import OfflineHeaderView from './view/offline-header';
 
-const api = new API(API_URL, TOKEN);
+const provider = new Provider(new API(API_URL, TOKEN), new Store(STORE_NAME, localStorage));
 
 const navigationElement = document.querySelector('.trip-controls__navigation');
 const filtersElement = document.querySelector('.trip-controls__filters');
@@ -23,6 +26,8 @@ render(tripEventsElement, statsComponent, 'afterend');
 
 const menuComponent = new MenuView();
 render(navigationElement, menuComponent);
+
+const offlineHeaderComponent = new OfflineHeaderView();
 
 const eventsModel = new EventsModel();
 const offersModel = new OffersModel();
@@ -38,7 +43,7 @@ const tripPresenter = new TripPresenter(
   filtersModel,
   offersModel,
   destinationsModel,
-  api,
+  provider,
 );
 
 filtersPresenter.initialize();
@@ -48,8 +53,8 @@ loadData();
 
 async function loadData() {
   try {
-    const offers = await api.getOffers();
-    const destinations = await api.getDestinations();
+    const offers = await provider.getOffers();
+    const destinations = await provider.getDestinations();
     offersModel.setOffers(offers);
     destinationsModel.setDestinations(destinations.map(DestinationsModel.convertFromServer));
   } catch (error) {
@@ -58,7 +63,7 @@ async function loadData() {
   }
 
   try {
-    const events = await api.getEvents();
+    const events = await provider.getEvents();
     eventsModel.setEvents(RedrawScope.INIT, events.map(EventsModel.convertFromServer));
   } catch (error) {
     const events = [];
@@ -107,3 +112,22 @@ function setErrorOverlay() {
 window.addEventListener('load', () => {
   navigator.serviceWorker.register('/sw.js');
 });
+
+window.addEventListener('online', () => {
+  if (provider.needsSync) {
+    provider.sync();
+  }
+  remove(offlineHeaderComponent);
+  tripPresenter.toggleNewEventButton();
+});
+
+window.addEventListener('offline', () => {
+  render(document.body, offlineHeaderComponent, 'afterbegin');
+  tripPresenter.toggleNewEventButton();
+});
+
+if (!isOnline()) {
+  render(document.body, offlineHeaderComponent, 'afterbegin');
+  tripPresenter.toggleNewEventButton();
+}
+

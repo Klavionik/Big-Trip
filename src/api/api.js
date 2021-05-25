@@ -1,4 +1,4 @@
-import {HttpMethod} from './const';
+import {HttpMethod} from '../const';
 
 class API {
   constructor(baseUrl, token) {
@@ -28,6 +28,10 @@ class API {
 
   getDestinations() {
     return this._request(HttpMethod.GET, '/destinations').then(API.getJSON);
+  }
+
+  sync(data) {
+    return this._request(HttpMethod.POST, '/points/sync', data).then(API.getJSON);
   }
 
   _checkStatus(response) {

@@ -1,5 +1,6 @@
 import {processEventDate} from '../utils/dates';
 import AbstractView from './abstract-view';
+import {isOnline} from '../utils/common';
 
 const createOffersTemplate = (offers) => {
   const createOffers = () => {
@@ -77,6 +78,10 @@ class EventItem extends AbstractView {
 
   _rollupClickHandler(evt) {
     evt.preventDefault();
+
+    if (!isOnline()) {
+      return;
+    }
 
     if (typeof this._callbacks.rollupClick === 'function') {
       this._callbacks.rollupClick();

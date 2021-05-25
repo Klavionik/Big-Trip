@@ -74,6 +74,10 @@ class Trip {
     this._currentSortType = SortType.DAY;
     this._filtersModel.setFilter(RedrawScope.PAGE, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this._toggleNewEventButton);
+    this.toggleNewEventButton();
+  }
+
+  toggleNewEventButton() {
     this._toggleNewEventButton();
   }
 

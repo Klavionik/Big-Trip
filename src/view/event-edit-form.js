@@ -8,6 +8,7 @@ import {formatInputDate} from '../utils/dates';
 import SmartView from './smart-view';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
+import {isOnline} from '../utils/common';
 
 const createEventEditFormTemplate = (
   event,
@@ -200,7 +201,13 @@ class EventEditForm extends SmartView {
   }
 
   _getOffersForEventType() {
-    return [...this._availableOffers.find(((offer) => offer.type === this._data.type)).offers];
+    const eventTypeOffers = this._availableOffers.find(((offer) => offer.type === this._data.type));
+
+    if (eventTypeOffers) {
+      return [...eventTypeOffers.offers];
+    }
+
+    return [];
   }
 
   _setPriceInputHandler() {
@@ -302,6 +309,10 @@ class EventEditForm extends SmartView {
 
   _rollupClickHandler(evt) {
     evt.preventDefault();
+
+    if (!isOnline()) {
+      return;
+    }
 
     if (typeof this._callbacks.rollupClick === 'function') {
       this._callbacks.rollupClick();
