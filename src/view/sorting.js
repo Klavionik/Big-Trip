@@ -43,17 +43,17 @@ class Sorting extends AbstractView {
     return createSortingTemplate(this._currentSortType);
   }
 
+  setSortTypeChangeHandler(cb) {
+    this._callbacks.sortTypeChange = cb;
+    this.getElement().addEventListener('change', this._sortTypeChangeHandler);
+  }
+
   _sortTypeChangeHandler(evt) {
     evt.preventDefault();
 
     if (typeof this._callbacks.sortTypeChange === 'function') {
       this._callbacks.sortTypeChange(evt.target.value);
     }
-  }
-
-  setSortTypeChangeHandler(cb) {
-    this._callbacks.sortTypeChange = cb;
-    this.getElement().addEventListener('change', this._sortTypeChangeHandler);
   }
 }
 

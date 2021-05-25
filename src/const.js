@@ -67,6 +67,12 @@ const Mode = {
   EDIT: 'EDIT',
 };
 
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
+};
+
 
 export {
   TYPES,
@@ -82,5 +88,6 @@ export {
   ERROR_MSG,
   State,
   Mode,
-  STORE_NAME
+  STORE_NAME,
+  RenderPosition
 };

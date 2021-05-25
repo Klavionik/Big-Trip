@@ -20,7 +20,7 @@ class Event {
 
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
-    this._closeOnEscape = this._closeOnEscape.bind(this);
+    this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
@@ -88,7 +88,7 @@ class Event {
 
   _replaceItemWithForm() {
     replace(this._eventItem, this._eventEditForm);
-    document.addEventListener('keydown', this._closeOnEscape);
+    document.addEventListener('keydown', this._handleKeyDown);
     this._updateMode();
     this._mode = Mode.EDIT;
     this._eventEditForm.setDatepickers();
@@ -97,16 +97,11 @@ class Event {
   _replaceFormWithItem() {
     this._eventEditForm.reset(this._event);
     replace(this._eventEditForm, this._eventItem);
-    document.removeEventListener('keydown', this._closeOnEscape);
+    document.removeEventListener('keydown', this._handleKeyDown);
     this._mode = Mode.VIEW;
     this._eventEditForm.destroyDatepickers();
   }
 
-  _closeOnEscape(evt) {
-    if (evt.code === 'Escape') {
-      this._replaceFormWithItem();
-    }
-  }
 
   _setEventItemHandlers() {
     this._eventItem.setRollupClickHandler(this._replaceItemWithForm);
@@ -115,9 +110,15 @@ class Event {
 
   _setEventEditFormHandlers() {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
-    this._eventEditForm.setSubmitHandler(this._handleSubmit);
+    this._eventEditForm.setFormSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
     this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
+  }
+
+  _handleKeyDown(evt) {
+    if (evt.code === 'Escape') {
+      this._replaceFormWithItem();
+    }
   }
 
   _handleDestination(data) {

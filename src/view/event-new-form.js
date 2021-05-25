@@ -113,8 +113,8 @@ class EventNewForm extends SmartView {
     this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
     this._priceInputHandler = this._priceInputHandler.bind(this);
 
-    this._submitHandler = this._submitHandler.bind(this);
-    this._cancelHandler = this._cancelHandler.bind(this);
+    this._formSubmitHandler = this._formSubmitHandler.bind(this);
+    this._cancelClickHandler = this._cancelClickHandler.bind(this);
 
     this._setInnerHandlers();
     this.setDatepickers();
@@ -134,7 +134,7 @@ class EventNewForm extends SmartView {
     this._setInnerHandlers();
 
     this.setDatepickers();
-    this.setSubmitHandler(this._callbacks.submit);
+    this.setFormSubmitHandler(this._callbacks.formSubmit);
     this.setCancelClickHandler(this._callbacks.cancel);
   }
 
@@ -158,14 +158,45 @@ class EventNewForm extends SmartView {
     this.shake(cb);
   }
 
-  setSubmitHandler(cb) {
-    this._callbacks.submit = cb;
-    this.getElement().addEventListener('submit', this._submitHandler);
+  setDatepickers() {
+    this.destroyDatepickers();
+    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
+    this._datepickerEnd = this._createDatepicker(
+      '#event-end-time-1',
+      this._dateEndChangeHandler,
+      {
+        minDate: formatInputDate(this._data.start),
+        defaultDate: formatInputDate(this._data.end),
+      },
+    );
+  }
+
+  destroyDatepickers() {
+    if (this._datepickerStart) {
+      this._datepickerStart.destroy();
+      this._datepickerStart = null;
+    }
+
+    if (this._datepickerEnd) {
+      this._datepickerEnd.destroy();
+      this._datepickerEnd = null;
+    }
+  }
+
+  setFormSubmitHandler(cb) {
+    this._callbacks.formSubmit = cb;
+    this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 
   setCancelClickHandler(cb) {
     this._callbacks.cancel = cb;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelHandler);
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._cancelClickHandler);
+  }
+
+  setDestinationChangeHandler(cb) {
+    this._callbacks.destinationChange = cb;
+    const element = this.getElement().querySelector('.event__input--destination');
+    element.addEventListener('change', this._destinationChangeHandler);
   }
 
   _getOffersForEventType() {
@@ -209,37 +240,6 @@ class EventNewForm extends SmartView {
         ...options,
       },
     );
-  }
-
-  setDatepickers() {
-    this.destroyDatepickers();
-    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datepickerEnd = this._createDatepicker(
-      '#event-end-time-1',
-      this._dateEndChangeHandler,
-      {
-        minDate: formatInputDate(this._data.start),
-        defaultDate: formatInputDate(this._data.end),
-      },
-    );
-  }
-
-  destroyDatepickers() {
-    if (this._datepickerStart) {
-      this._datepickerStart.destroy();
-      this._datepickerStart = null;
-    }
-
-    if (this._datepickerEnd) {
-      this._datepickerEnd.destroy();
-      this._datepickerEnd = null;
-    }
-  }
-
-  setDestinationChangeHandler(cb) {
-    this._callbacks.destinationChange = cb;
-    const element = this.getElement().querySelector('.event__input--destination');
-    element.addEventListener('change', this._destinationChangeHandler);
   }
 
   _setInnerHandlers() {
@@ -299,11 +299,11 @@ class EventNewForm extends SmartView {
     this.updateData({price: parseInt(price)}, false);
   }
 
-  _submitHandler(evt) {
+  _formSubmitHandler(evt) {
     evt.preventDefault();
 
-    if (typeof this._callbacks.submit === 'function') {
-      this._callbacks.submit(this._data);
+    if (typeof this._callbacks.formSubmit === 'function') {
+      this._callbacks.formSubmit(this._data);
     }
   }
 
@@ -325,7 +325,7 @@ class EventNewForm extends SmartView {
     this.setDatepickers();
   }
 
-  _cancelHandler(evt) {
+  _cancelClickHandler(evt) {
     evt.preventDefault();
 
     if (typeof this._callbacks.cancel === 'function') {

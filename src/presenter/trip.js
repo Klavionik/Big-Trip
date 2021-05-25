@@ -6,7 +6,7 @@ import EventListView from '../view/event-list';
 import NoEventsView from '../view/no-events';
 import EventPresenter from '../presenter/event';
 import EventNewPresenter from './event-new';
-import {SortType, RedrawScope, ActionType, FilterType, State} from '../const';
+import {SortType, RedrawScope, ActionType, FilterType, State, RenderPosition} from '../const';
 import {compareByDate, compareByDuration, compareByPrice} from '../utils/compare';
 import {filters} from '../utils/filters';
 import {getDuration} from '../utils/dates';
@@ -40,7 +40,7 @@ class Trip {
     this._handleSortTypeChanged = this._handleSortTypeChanged.bind(this);
     this._handleViewAction = this._handleViewAction.bind(this);
     this._handleModelEvent = this._handleModelEvent.bind(this);
-    this._toggleNewEventButton = this._toggleNewEventButton.bind(this);
+    this.toggleNewEventButton = this.toggleNewEventButton.bind(this);
   }
 
   initialize() {
@@ -73,12 +73,13 @@ class Trip {
     remove(this._noEventsComponent);
     this._currentSortType = SortType.DAY;
     this._filtersModel.setFilter(RedrawScope.PAGE, FilterType.EVERYTHING);
-    this._eventNewPresenter.initialize(this._toggleNewEventButton);
+    this._eventNewPresenter.initialize(this.toggleNewEventButton);
     this.toggleNewEventButton();
   }
 
   toggleNewEventButton() {
-    this._toggleNewEventButton();
+    const button = this._infoContainer.querySelector('.trip-main__event-add-btn');
+    button.disabled = !button.disabled;
   }
 
   exportStats() {
@@ -126,11 +127,6 @@ class Trip {
     }
   }
 
-  _toggleNewEventButton() {
-    const button = this._infoContainer.querySelector('.trip-main__event-add-btn');
-    button.disabled = !button.disabled;
-  }
-
   _renderTrip(keepTripInfo = false) {
     if (this._isLoading) {
       this._renderLoading();
@@ -159,7 +155,7 @@ class Trip {
 
     if (events.length) {
       this._tripInfoComponent = new TripInfoView(calculateTripInfo(events));
-      render(this._infoContainer, this._tripInfoComponent, 'afterbegin');
+      render(this._infoContainer, this._tripInfoComponent, RenderPosition.AFTERBEGIN);
     }
   }
 
@@ -190,7 +186,7 @@ class Trip {
 
   _renderSorting() {
     this._sortingComponent = new SortingView(this._currentSortType);
-    render(this._tripContainer, this._sortingComponent, 'afterbegin');
+    render(this._tripContainer, this._sortingComponent, RenderPosition.AFTERBEGIN);
     this._sortingComponent.setSortTypeChangeHandler(this._handleSortTypeChanged);
   }
 

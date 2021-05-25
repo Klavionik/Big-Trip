@@ -76,6 +76,20 @@ class EventItem extends AbstractView {
     return createEventItemTemplate(this._event);
   }
 
+  setAborted() {
+    this.shake(() => {});
+  }
+
+  setRollupClickHandler(cb) {
+    this._callbacks.rollupClick = cb;
+    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
+  }
+
+  setIsFavoriteClickHandler(cb) {
+    this._callbacks.isFavoriteClick = cb;
+    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._isFavoriteClickHandler);
+  }
+
   _rollupClickHandler(evt) {
     evt.preventDefault();
 
@@ -94,20 +108,6 @@ class EventItem extends AbstractView {
     if (typeof this._callbacks.isFavoriteClick === 'function') {
       this._callbacks.isFavoriteClick();
     }
-  }
-
-  setAborted() {
-    this.shake(() => {});
-  }
-
-  setRollupClickHandler(cb) {
-    this._callbacks.rollupClick = cb;
-    this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
-  }
-
-  setIsFavoriteClickHandler(cb) {
-    this._callbacks.isFavoriteClick = cb;
-    this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._isFavoriteClickHandler);
   }
 }
 
