@@ -104,3 +104,6 @@ function setErrorOverlay() {
   document.body.classList.add('error-overlay');
 }
 
+window.addEventListener('load', () => {
+  navigator.serviceWorker.register('/sw.js');
+});
