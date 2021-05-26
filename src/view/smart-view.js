@@ -24,8 +24,8 @@ class SmartView extends AbstractView {
     const previousElement = this.getElement();
     this.removeElement();
 
-    const newELement = this.getElement();
-    previousElement.replaceWith(newELement);
+    const newElement = this.getElement();
+    previousElement.replaceWith(newElement);
 
     this.restoreHandlers();
   }

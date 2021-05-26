@@ -1,8 +1,11 @@
 import {isOnline} from '../utils/common.js';
 
 const getSyncedEvents = (items) => {
-  return items.filter(({success}) => success)
-    .map(({payload}) => payload.point);
+  return items.map((item) => {
+    if (item.success) {
+      return item.payload.point;
+    }
+  });
 };
 
 const createStoreStructure = (items) => {

@@ -20,6 +20,28 @@ const filtersElement = document.querySelector('.trip-controls__filters');
 const tripMainElement = document.querySelector('.trip-main');
 const tripEventsElement = document.querySelector('.trip-events');
 
+const provider = new Provider(new API(API_URL, TOKEN), new Store(STORE_NAME, localStorage));
+
+const statsComponent = new StatsView();
+const menuComponent = new MenuView();
+const offlineHeaderComponent = new OfflineHeaderView();
+
+const eventsModel = new EventsModel();
+const offersModel = new OffersModel();
+const destinationsModel = new DestinationsModel();
+const filtersModel = new FiltersModel();
+
+const filtersPresenter = new FiltersPresenter(filtersElement, filtersModel, eventsModel);
+const tripPresenter = new TripPresenter(
+  tripMainElement,
+  tripEventsElement,
+  eventsModel,
+  filtersModel,
+  offersModel,
+  destinationsModel,
+  provider,
+);
+
 const handleMenuItemClick = (element) => {
   const {path} = element.dataset;
 
@@ -38,7 +60,7 @@ const handleMenuItemClick = (element) => {
   menuComponent.toggleMenuItem(path);
 };
 
-const handleNewEventClick = (evt) => {
+const newEventClickHandler = (evt) => {
   evt.preventDefault();
   statsComponent.hide();
   menuComponent.toggleMenuItem(MenuItem.TRIP);
@@ -48,35 +70,11 @@ const handleNewEventClick = (evt) => {
 
 const setMenuHandlers = () => {
   menuComponent.setMenuItemClickHandler(handleMenuItemClick);
-  tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', handleNewEventClick);
+  tripMainElement.querySelector('.trip-main__event-add-btn').addEventListener('click', newEventClickHandler);
 };
 
-const provider = new Provider(new API(API_URL, TOKEN), new Store(STORE_NAME, localStorage));
-
-const statsComponent = new StatsView();
 render(tripEventsElement, statsComponent, RenderPosition.AFTEREND);
-
-const menuComponent = new MenuView();
 render(navigationElement, menuComponent);
-
-const offlineHeaderComponent = new OfflineHeaderView();
-
-const eventsModel = new EventsModel();
-const offersModel = new OffersModel();
-const destinationsModel = new DestinationsModel();
-
-const filtersModel = new FiltersModel();
-const filtersPresenter = new FiltersPresenter(filtersElement, filtersModel, eventsModel);
-
-const tripPresenter = new TripPresenter(
-  tripMainElement,
-  tripEventsElement,
-  eventsModel,
-  filtersModel,
-  offersModel,
-  destinationsModel,
-  provider,
-);
 
 filtersPresenter.initialize();
 tripPresenter.initialize();

@@ -6,11 +6,11 @@ class Offers extends Observer {
     this._offers = [];
   }
 
-  getOffers() {
+  getItems() {
     return [...this._offers];
   }
 
-  setOffers(offers) {
+  setItems(offers) {
     this._offers = [...offers];
   }
 

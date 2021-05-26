@@ -7,8 +7,8 @@ const loadData = async (provider, offersModel, destinationsModel, eventsModel, c
   try {
     const offers = await provider.getOffers();
     const destinations = await provider.getDestinations();
-    offersModel.setOffers(offers);
-    destinationsModel.setDestinations(destinations.map(DestinationsModel.convertFromServer));
+    offersModel.setItems(offers);
+    destinationsModel.setItems(destinations.map(DestinationsModel.convertFromServer));
   } catch (error) {
     setErrorOverlay();
     return;
@@ -16,10 +16,10 @@ const loadData = async (provider, offersModel, destinationsModel, eventsModel, c
 
   try {
     const events = await provider.getEvents();
-    eventsModel.setEvents(RedrawScope.INIT, events.map(EventsModel.convertFromServer));
+    eventsModel.setItems(RedrawScope.INIT, events.map(EventsModel.convertFromServer));
   } catch (error) {
     const events = [];
-    eventsModel.setEvents(RedrawScope.INIT, events);
+    eventsModel.setItems(RedrawScope.INIT, events);
   } finally {
     cb();
   }

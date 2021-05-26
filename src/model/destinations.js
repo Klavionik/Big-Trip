@@ -6,7 +6,7 @@ class Destinations extends Observer {
     this._destinations = [];
   }
 
-  getDestinations() {
+  getItems() {
     return this._destinations.map((destination) => destination.destination);
   }
 
@@ -15,7 +15,7 @@ class Destinations extends Observer {
 
   }
 
-  setDestinations(destinations) {
+  setItems(destinations) {
     this._destinations = [...destinations];
   }
 

@@ -20,7 +20,8 @@ const formatDuration = (durationMs) => {
   }
 
   if (durationMs >= DAY_IN_MS) {
-    return duration.format('DD[D] HH[H] mm[M]');
+    const days = Math.floor(duration.asDays());
+    return duration.format(`${days}[D] HH[H] mm[M]`);
   }
 };
 
@@ -75,8 +76,6 @@ const isFuture = (event)  => {
   return dayjs(event.start).isSameOrAfter(now()) || dayjs(event.end).isAfter(now());
 };
 
-const makeEmptyDuration = () => dayjs.duration(0);
-
 export {
   processEventDate,
   formatInputDate,
@@ -84,6 +83,5 @@ export {
   isFuture,
   isPast,
   getDuration,
-  formatDuration,
-  makeEmptyDuration
+  formatDuration
 };

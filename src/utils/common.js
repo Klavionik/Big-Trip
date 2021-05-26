@@ -1,5 +1,5 @@
 import AbstractView from '../view/abstract-view';
-import {ERROR_ATTR, ERROR_MSG} from '../const';
+import {ERROR_ATTR, ERROR_MSG, RenderPosition} from '../const';
 
 const createElement = (html) => {
   const container = document.createElement('template');
@@ -44,4 +44,15 @@ const setErrorOverlay = () => {
   document.body.classList.add('error-overlay');
 };
 
-export {createElement, render, replace, remove, isOnline, setErrorOverlay};
+const showOfflineNotification = (parent) => {
+  const notification = document.createElement('span');
+  notification.textContent = 'Sorry, you seem to be offline';
+  notification.classList.add('offline-notification');
+  notification.addEventListener('click', () => notification.remove());
+
+  render(parent, notification, RenderPosition.BEFOREBEGIN);
+
+  setTimeout(() => notification.remove(), 3000);
+};
+
+export {createElement, render, replace, remove, isOnline, setErrorOverlay, showOfflineNotification};
