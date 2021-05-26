@@ -42,7 +42,7 @@ class Event {
     this._setEventItemHandlers();
     this._setEventEditFormHandlers();
 
-    if (previousEventItem == null || previousEventEditForm == null) {
+    if (previousEventItem === null || previousEventEditForm === null) {
       render(this._eventList, this._eventItem);
       return;
     }
