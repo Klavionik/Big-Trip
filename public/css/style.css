@@ -1048,3 +1048,17 @@ main {
   background: indianred;
   z-index: 1;
 }
+
+.offline-notification {
+  position: absolute;
+  left: 75%;
+  padding: 4px;
+
+  color: white;
+  border-radius: 5px;
+  background-color: indianred;
+  cursor: pointer;
+
+  z-index: 1;
+  transform: translateY(-10px);
+}

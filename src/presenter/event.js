@@ -20,7 +20,7 @@ class Event {
 
     this._replaceItemWithForm = this._replaceItemWithForm.bind(this);
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
-    this._handleKeyDown = this._handleKeyDown.bind(this);
+    this._keyDownHandler = this._keyDownHandler.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
     this._handleDestination = this._handleDestination.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
@@ -33,8 +33,8 @@ class Event {
     const previousEventItem = this._eventItem;
     const previousEventEditForm = this._eventEditForm;
 
-    const offers = this._offersModel.getOffers();
-    const availableDestinations = this._destinationsModel.getDestinations();
+    const offers = this._offersModel.getItems();
+    const availableDestinations = this._destinationsModel.getItems();
 
     this._eventItem = new EventItem(event);
     this._eventEditForm = new EventEditForm(event, offers, availableDestinations);
@@ -66,7 +66,7 @@ class Event {
   }
 
   destroy() {
-    this._eventEditForm.destroyDatepickers();
+    this._eventEditForm.destroyDatePickers();
     remove(this._eventItem);
     remove(this._eventEditForm);
   }
@@ -88,18 +88,18 @@ class Event {
 
   _replaceItemWithForm() {
     replace(this._eventItem, this._eventEditForm);
-    document.addEventListener('keydown', this._handleKeyDown);
+    document.addEventListener('keydown', this._keyDownHandler);
     this._updateMode();
     this._mode = Mode.EDIT;
-    this._eventEditForm.setDatepickers();
+    this._eventEditForm.setDatePickers();
   }
 
   _replaceFormWithItem() {
     this._eventEditForm.reset(this._event);
     replace(this._eventEditForm, this._eventItem);
-    document.removeEventListener('keydown', this._handleKeyDown);
+    document.removeEventListener('keydown', this._keyDownHandler);
     this._mode = Mode.VIEW;
-    this._eventEditForm.destroyDatepickers();
+    this._eventEditForm.destroyDatePickers();
   }
 
 
@@ -115,7 +115,7 @@ class Event {
     this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
   }
 
-  _handleKeyDown(evt) {
+  _keyDownHandler(evt) {
     if (evt.code === 'Escape') {
       this._replaceFormWithItem();
     }

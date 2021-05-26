@@ -13,7 +13,7 @@ class EventNew {
     this._eventNewForm = null;
     this._cancelCallback = null;
 
-    this._handleKeyDown = this._handleKeyDown.bind(this);
+    this._keyDownHandler = this._keyDownHandler.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancel = this._handleCancel.bind(this);
     this._handleDestinationChange = this._handleDestinationChange.bind(this);
@@ -26,15 +26,15 @@ class EventNew {
       event = this._getDefaultEvent();
     }
 
-    const availableOffers = this._offersModel.getOffers();
-    const availableDestinations = this._destinationsModel.getDestinations();
+    const availableOffers = this._offersModel.getItems();
+    const availableDestinations = this._destinationsModel.getItems();
 
     this._eventNewForm = new EventNewForm(event, availableOffers, availableDestinations);
     this._setEventNewFormHandlers();
 
     render(this._eventList, this._eventNewForm, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener('keydown', this._handleKeyDown);
+    document.addEventListener('keydown', this._keyDownHandler);
   }
 
   destroy() {
@@ -47,10 +47,10 @@ class EventNew {
     }
 
     remove(this._eventNewForm);
-    this._eventNewForm.destroyDatepickers();
+    this._eventNewForm.destroyDatePickers();
     this._eventNewForm = null;
 
-    document.removeEventListener('keydown', this._handleKeyDown);
+    document.removeEventListener('keydown', this._keyDownHandler);
   }
 
   setViewSaving() {
@@ -84,7 +84,7 @@ class EventNew {
     this._eventNewForm.updateData({...data, description: description});
   }
 
-  _handleKeyDown(evt) {
+  _keyDownHandler(evt) {
     if (evt.code === 'Escape') {
       evt.preventDefault();
       this.destroy();

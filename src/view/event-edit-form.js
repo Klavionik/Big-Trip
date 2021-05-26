@@ -8,7 +8,7 @@ import {formatInputDate} from '../utils/dates';
 import SmartView from './smart-view';
 import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import {isOnline} from '../utils/common';
+import {isOnline, showOfflineNotification} from '../utils/common';
 
 const createEventEditFormTemplate = (
   event,
@@ -95,8 +95,8 @@ class EventEditForm extends SmartView {
 
     this._availableOffers = availableOffers;
     this._availableDestinations = availableDestinations;
-    this._datepickerStart = null;
-    this._datepickerEnd = null;
+    this._datePickerStart = null;
+    this._datePickerEnd = null;
 
     this._isDisabled = false;
     this._isSaving = false;
@@ -130,7 +130,7 @@ class EventEditForm extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
 
-    this.setDatepickers();
+    this.setDatePickers();
     this.setFormSubmitHandler(this._callbacks.formSubmit);
     this.setDeleteClickHandler(this._callbacks.deleteClick);
     this.setRollupClickHandler(this._callbacks.rollupClick);
@@ -180,22 +180,22 @@ class EventEditForm extends SmartView {
     element.addEventListener('change', this._destinationChangeHandler);
   }
 
-  destroyDatepickers() {
-    if (this._datepickerStart) {
-      this._datepickerStart.destroy();
-      this._datepickerStart = null;
+  destroyDatePickers() {
+    if (this._datePickerStart) {
+      this._datePickerStart.destroy();
+      this._datePickerStart = null;
     }
 
-    if (this._datepickerEnd) {
-      this._datepickerEnd.destroy();
-      this._datepickerEnd = null;
+    if (this._datePickerEnd) {
+      this._datePickerEnd.destroy();
+      this._datePickerEnd = null;
     }
   }
 
-  setDatepickers() {
-    this.destroyDatepickers();
-    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datepickerEnd = this._createDatepicker(
+  setDatePickers() {
+    this.destroyDatePickers();
+    this._datePickerStart = this._createDatePicker('#event-start-time-1', this._dateStartChangeHandler);
+    this._datePickerEnd = this._createDatePicker(
       '#event-end-time-1',
       this._dateEndChangeHandler,
       {
@@ -241,7 +241,7 @@ class EventEditForm extends SmartView {
     });
   }
 
-  _createDatepicker(selector, onChangeHandler, options) {
+  _createDatePicker(selector, onChangeHandler, options) {
     return flatpickr(
       this.getElement().querySelector(selector),
       {
@@ -310,10 +310,6 @@ class EventEditForm extends SmartView {
   _rollupClickHandler(evt) {
     evt.preventDefault();
 
-    if (!isOnline()) {
-      return;
-    }
-
     if (typeof this._callbacks.rollupClick === 'function') {
       this._callbacks.rollupClick();
     }
@@ -321,6 +317,12 @@ class EventEditForm extends SmartView {
 
   _formSubmitHandler(evt) {
     evt.preventDefault();
+
+    if (!isOnline()) {
+      this.shake(() => {});
+      showOfflineNotification(this.getElement());
+      return;
+    }
 
     if (typeof this._callbacks.formSubmit === 'function') {
       this._callbacks.formSubmit(this._data);
@@ -335,18 +337,24 @@ class EventEditForm extends SmartView {
     }
 
     this.updateData(payload, false);
-    this.setDatepickers();
+    this.setDatePickers();
   }
 
   _dateEndChangeHandler([date]) {
     this.updateData({
       end: date.toISOString(),
     }, false);
-    this.setDatepickers();
+    this.setDatePickers();
   }
 
   _deleteClickHandler(evt) {
     evt.preventDefault();
+
+    if (!isOnline()) {
+      this.shake(() => {});
+      showOfflineNotification(this.getElement());
+      return;
+    }
 
     if (typeof this._callbacks.deleteClick === 'function') {
       this._callbacks.deleteClick(this._data);

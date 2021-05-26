@@ -12,7 +12,7 @@ class Menu extends AbstractView {
   constructor() {
     super();
 
-    this._handleMenuItemClick = this._handleMenuItemClick.bind(this);
+    this._menuItemClickHandler = this._menuItemClickHandler.bind(this);
   }
 
   getTemplate() {
@@ -33,10 +33,10 @@ class Menu extends AbstractView {
     this._callbacks.menuItemClick = cb;
 
     const elements = this.getElement().querySelectorAll('a');
-    elements.forEach((element) => element.addEventListener('click', this._handleMenuItemClick));
+    elements.forEach((element) => element.addEventListener('click', this._menuItemClickHandler));
   }
 
-  _handleMenuItemClick(evt) {
+  _menuItemClickHandler(evt) {
     evt.preventDefault();
 
     if (typeof this._callbacks.menuItemClick === 'function') {

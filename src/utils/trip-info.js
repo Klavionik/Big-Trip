@@ -1,11 +1,13 @@
 import dayjs from 'dayjs';
 import {compareByDate} from './compare';
 
+const MAX_DESTINATIONS = 3;
+
 const getRoute = (events) => {
   const {length: eventPoints} = events;
   let route;
 
-  if (eventPoints <= 3) {
+  if (eventPoints <= MAX_DESTINATIONS) {
     route = events.map(({destination}) => destination).join(' &mdash; ');
   } else {
     const {destination: firstDestination} = events[0];

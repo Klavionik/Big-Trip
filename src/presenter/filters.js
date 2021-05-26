@@ -22,7 +22,7 @@ class Filters {
     const filters = this._getFilters();
     const previousFilterComponent = this._filtersComponent;
 
-    this._filtersComponent = new FiltersView(filters, this._filtersModel.getFilter());
+    this._filtersComponent = new FiltersView(filters, this._filtersModel.getActive());
     this._filtersComponent.setFilterTypeChangeHandler(this._handleFilterTypeChange);
 
     if (previousFilterComponent === null) {
@@ -34,7 +34,7 @@ class Filters {
   }
 
   _getFilters() {
-    const events = this._eventsModel.getEvents();
+    const events = this._eventsModel.getItems();
 
     return [
       {
@@ -60,11 +60,11 @@ class Filters {
   }
 
   _handleFilterTypeChange(filterType) {
-    if (this._filtersModel.getFilter() === filterType) {
+    if (this._filtersModel.getActive() === filterType) {
       return;
     }
 
-    this._filtersModel.setFilter(RedrawScope.PAGE, filterType);
+    this._filtersModel.setActive(RedrawScope.PAGE, filterType);
   }
 }
 

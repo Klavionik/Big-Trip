@@ -6,21 +6,21 @@ class Events extends Observer {
     this._events = [];
   }
 
-  getEvents() {
+  getItems() {
     return this._events;
   }
 
-  setEvents(redrawScope, events) {
+  setItems(redrawScope, events) {
     this._events = [...events];
     this._notify(redrawScope);
   }
 
-  addEvent(redrawScope, data) {
+  addItem(redrawScope, data) {
     this._events = [...this._events, data];
     this._notify(redrawScope, data);
   }
 
-  updateEvent(redrawScope, data) {
+  updateItem(redrawScope, data) {
     const index = this._events.findIndex(({id}) => id === data.id);
 
     if (index !== -1) {
@@ -33,7 +33,7 @@ class Events extends Observer {
     }
   }
 
-  deleteEvent(redrawScope, data) {
+  deleteItem(redrawScope, data) {
     const index = this._events.findIndex(({id}) => id === data.id);
 
     if (index !== -1) {

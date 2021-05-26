@@ -72,7 +72,7 @@ class Trip {
   addEvent() {
     remove(this._noEventsComponent);
     this._currentSortType = SortType.DAY;
-    this._filtersModel.setFilter(RedrawScope.PAGE, FilterType.EVERYTHING);
+    this._filtersModel.setActive(RedrawScope.PAGE, FilterType.EVERYTHING);
     this._eventNewPresenter.initialize(this.toggleNewEventButton);
     this.toggleNewEventButton();
   }
@@ -83,7 +83,7 @@ class Trip {
   }
 
   exportStats() {
-    const events = this._eventsModel.getEvents();
+    const events = this._eventsModel.getItems();
 
     const moneyStats = {};
     const typeStats = {};
@@ -113,8 +113,8 @@ class Trip {
   }
 
   _getEvents() {
-    const events = [...this._eventsModel.getEvents()];
-    const filter = this._filtersModel.getFilter();
+    const events = [...this._eventsModel.getItems()];
+    const filter = this._filtersModel.getActive();
     const filteredEvents = filters[filter](events);
 
     switch (this._currentSortType) {
@@ -134,7 +134,7 @@ class Trip {
     }
 
     if (!keepTripInfo) {
-      this._renderTripInfo(this._eventsModel.getEvents());
+      this._renderTripInfo(this._eventsModel.getItems());
     }
 
     const events = this._getEvents();
@@ -210,20 +210,20 @@ class Trip {
         this._eventNewPresenter.setViewSaving();
         this._api.createEvent(EventsModel.convertToServer(data))
           .then(EventsModel.convertFromServer)
-          .then((data) => this._eventsModel.addEvent(redrawScope, data))
+          .then((data) => this._eventsModel.addItem(redrawScope, data))
           .catch(() => this._eventNewPresenter.setViewAborted());
         break;
       case ActionType.UPDATE:
         this._eventPresenters[data.id].setViewState(State.SAVING);
         this._api.updateEvent(EventsModel.convertToServer(data))
           .then(EventsModel.convertFromServer)
-          .then((data) => this._eventsModel.updateEvent(redrawScope, data))
+          .then((data) => this._eventsModel.updateItem(redrawScope, data))
           .catch(() =>  this._eventPresenters[data.id].setViewState(State.ABORTED));
         break;
       case ActionType.DELETE:
         this._eventPresenters[data.id].setViewState(State.DELETING);
         this._api.deleteEvent(data)
-          .then(() => this._eventsModel.deleteEvent(redrawScope, data))
+          .then(() => this._eventsModel.deleteItem(redrawScope, data))
           .catch(() => this._eventPresenters[data.id].setViewState(State.ABORTED));
     }
   }

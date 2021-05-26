@@ -7,6 +7,7 @@ import {
 import {formatInputDate} from '../utils/dates';
 import flatpickr from 'flatpickr';
 import SmartView from './smart-view';
+import {isOnline, showOfflineNotification} from '../utils/common';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`;
@@ -100,8 +101,8 @@ class EventNewForm extends SmartView {
 
     this._availableOffers = availableOffers;
     this._availableDestinations = availableDestinations;
-    this._datepickerStart = null;
-    this._datepickerEnd = null;
+    this._datePickerStart = null;
+    this._datePickerEnd = null;
 
     this._isDisabled = false;
     this._isSaving = false;
@@ -117,7 +118,7 @@ class EventNewForm extends SmartView {
     this._cancelClickHandler = this._cancelClickHandler.bind(this);
 
     this._setInnerHandlers();
-    this.setDatepickers();
+    this.setDatePickers();
   }
 
   getTemplate() {
@@ -133,7 +134,7 @@ class EventNewForm extends SmartView {
   restoreHandlers() {
     this._setInnerHandlers();
 
-    this.setDatepickers();
+    this.setDatePickers();
     this.setFormSubmitHandler(this._callbacks.formSubmit);
     this.setCancelClickHandler(this._callbacks.cancel);
   }
@@ -158,10 +159,10 @@ class EventNewForm extends SmartView {
     this.shake(cb);
   }
 
-  setDatepickers() {
-    this.destroyDatepickers();
-    this._datepickerStart = this._createDatepicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datepickerEnd = this._createDatepicker(
+  setDatePickers() {
+    this.destroyDatePickers();
+    this._datePickerStart = this._createDatePicker('#event-start-time-1', this._dateStartChangeHandler);
+    this._datePickerEnd = this._createDatePicker(
       '#event-end-time-1',
       this._dateEndChangeHandler,
       {
@@ -171,15 +172,15 @@ class EventNewForm extends SmartView {
     );
   }
 
-  destroyDatepickers() {
-    if (this._datepickerStart) {
-      this._datepickerStart.destroy();
-      this._datepickerStart = null;
+  destroyDatePickers() {
+    if (this._datePickerStart) {
+      this._datePickerStart.destroy();
+      this._datePickerStart = null;
     }
 
-    if (this._datepickerEnd) {
-      this._datepickerEnd.destroy();
-      this._datepickerEnd = null;
+    if (this._datePickerEnd) {
+      this._datePickerEnd.destroy();
+      this._datePickerEnd = null;
     }
   }
 
@@ -230,7 +231,7 @@ class EventNewForm extends SmartView {
     });
   }
 
-  _createDatepicker(selector, onChangeHandler, options) {
+  _createDatePicker(selector, onChangeHandler, options) {
     return flatpickr(
       this.getElement().querySelector(selector),
       {
@@ -302,6 +303,12 @@ class EventNewForm extends SmartView {
   _formSubmitHandler(evt) {
     evt.preventDefault();
 
+    if (!isOnline()) {
+      this.shake(() => {});
+      showOfflineNotification(this.getElement());
+      return;
+    }
+
     if (typeof this._callbacks.formSubmit === 'function') {
       this._callbacks.formSubmit(this._data);
     }
@@ -315,14 +322,14 @@ class EventNewForm extends SmartView {
     }
 
     this.updateData(payload, false);
-    this.setDatepickers();
+    this.setDatePickers();
   }
 
   _dateEndChangeHandler([date]) {
     this.updateData({
       end: date.toISOString(),
     }, false);
-    this.setDatepickers();
+    this.setDatePickers();
   }
 
   _cancelClickHandler(evt) {
