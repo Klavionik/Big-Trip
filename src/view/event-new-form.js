@@ -113,6 +113,10 @@ class EventNewForm extends BaseEvent {
   }
 
   restoreHandlers() {
+    if (this._isSaving) {
+      return;
+    }
+
     this._setInnerHandlers();
 
     this.setDatePickers();
