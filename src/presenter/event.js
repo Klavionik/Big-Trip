@@ -22,7 +22,7 @@ class Event {
     this._replaceFormWithItem = this._replaceFormWithItem.bind(this);
     this._keyDownHandler = this._keyDownHandler.bind(this);
     this._handleIsFavorite = this._handleIsFavorite.bind(this);
-    this._handleDestination = this._handleDestination.bind(this);
+    this._handleDestinationChange = this._handleDestinationChange.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleDelete = this._handleDelete.bind(this);
   }
@@ -112,7 +112,7 @@ class Event {
     this._eventEditForm.setRollupClickHandler(this._replaceFormWithItem);
     this._eventEditForm.setFormSubmitHandler(this._handleSubmit);
     this._eventEditForm.setDeleteClickHandler(this._handleDelete);
-    this._eventEditForm.setDestinationChangeHandler(this._handleDestination);
+    this._eventEditForm.setDestinationChangeHandler(this._handleDestinationChange);
   }
 
   _keyDownHandler(evt) {
@@ -121,7 +121,7 @@ class Event {
     }
   }
 
-  _handleDestination(data) {
+  _handleDestinationChange(data) {
     if (this._event.destination === data.destination) {
       return;
     }

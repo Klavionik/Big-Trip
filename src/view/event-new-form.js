@@ -5,9 +5,7 @@ import {
   createOffersTemplate
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
-import flatpickr from 'flatpickr';
-import SmartView from './smart-view';
-import {isOnline, showOfflineNotification} from '../utils/common';
+import BaseEvent from './base-event';
 
 const createPhotosTemplate = (description) => {
   const addPhoto = (photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`;
@@ -95,29 +93,12 @@ const createEventNewFormTemplate = (
               </form>`;
 };
 
-class EventNewForm extends SmartView {
+class EventNewForm extends BaseEvent {
   constructor(event, availableOffers, availableDestinations) {
-    super({...event});
+    super({...event}, availableOffers, availableDestinations);
 
-    this._availableOffers = availableOffers;
-    this._availableDestinations = availableDestinations;
-    this._datePickerStart = null;
-    this._datePickerEnd = null;
-
-    this._isDisabled = false;
-    this._isSaving = false;
-
-    this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
-    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
-    this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
-    this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
-    this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
-    this._priceInputHandler = this._priceInputHandler.bind(this);
-
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._cancelClickHandler = this._cancelClickHandler.bind(this);
-
-    this._setInnerHandlers();
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
     this.setDatePickers();
   }
 
@@ -137,16 +118,7 @@ class EventNewForm extends SmartView {
     this.setDatePickers();
     this.setFormSubmitHandler(this._callbacks.formSubmit);
     this.setCancelClickHandler(this._callbacks.cancel);
-  }
-
-  reset(event) {
-    this.updateData(event);
-  }
-
-  setSaving() {
-    this._isSaving = true;
-    this._isDisabled = true;
-    this.updateElement();
+    this.setDestinationChangeHandler(this._callbacks.destinationChange);
   }
 
   setAborted() {
@@ -156,37 +128,8 @@ class EventNewForm extends SmartView {
       this.updateElement();
     };
 
+    this._showOfflineNotification();
     this.shake(cb);
-  }
-
-  setDatePickers() {
-    this.destroyDatePickers();
-    this._datePickerStart = this._createDatePicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datePickerEnd = this._createDatePicker(
-      '#event-end-time-1',
-      this._dateEndChangeHandler,
-      {
-        minDate: formatInputDate(this._data.start),
-        defaultDate: formatInputDate(this._data.end),
-      },
-    );
-  }
-
-  destroyDatePickers() {
-    if (this._datePickerStart) {
-      this._datePickerStart.destroy();
-      this._datePickerStart = null;
-    }
-
-    if (this._datePickerEnd) {
-      this._datePickerEnd.destroy();
-      this._datePickerEnd = null;
-    }
-  }
-
-  setFormSubmitHandler(cb) {
-    this._callbacks.formSubmit = cb;
-    this.getElement().addEventListener('submit', this._formSubmitHandler);
   }
 
   setCancelClickHandler(cb) {
@@ -200,78 +143,10 @@ class EventNewForm extends SmartView {
     element.addEventListener('change', this._destinationChangeHandler);
   }
 
-  _getOffersForEventType() {
-    return [...this._availableOffers.find(((offer) => offer.type === this._data.type)).offers];
-  }
-
-  _setPriceInputHandler() {
-    const priceInputElement = this.getElement().querySelector('.event__input--price');
-    priceInputElement.addEventListener('input', this._priceInputHandler);
-  }
-
-  _setEventTypeClickHandler() {
-    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
-
-    eventTypeElements.forEach((element) => {
-      element.addEventListener('change', this._eventTypeClickHandler);
-    });
-  }
-
-  _setDestinationChangeHandler() {
-    const element = this.getElement().querySelector('.event__input--destination');
-
-    element.addEventListener('change', this._destinationChangeHandler);
-  }
-
-  _setEventOfferClickHandler() {
-    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
-
-    elements.forEach((element) => {
-      element.addEventListener('click', this._eventOfferClickHandler);
-    });
-  }
-
-  _createDatePicker(selector, onChangeHandler, options) {
-    return flatpickr(
-      this.getElement().querySelector(selector),
-      {
-        enableTime: true,
-        dateFormat: 'd/m/y H:i',
-        onChange: onChangeHandler,
-        ...options,
-      },
-    );
-  }
-
   _setInnerHandlers() {
     this._setEventTypeClickHandler();
-    this._setDestinationChangeHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
-  }
-
-  _eventTypeClickHandler(evt) {
-    evt.preventDefault();
-    this.updateData({type: evt.target.value, offers: []});
-  }
-
-  _eventOfferClickHandler(evt) {
-    evt.preventDefault();
-
-    const label = evt.target.parentElement.querySelector('label');
-    const title = label.children[0].textContent;
-    const price  = parseInt(label.children[1].textContent);
-
-    const offer = {title, price};
-    let offers;
-
-    if (this._data.offers.every((value) => value.title !== title)) {
-      offers = [...this._data.offers, offer];
-    } else {
-      offers = this._data.offers.filter((value) => value.title !== title);
-    }
-
-    this.updateData({offers});
   }
 
   _destinationChangeHandler(evt) {
@@ -290,46 +165,6 @@ class EventNewForm extends SmartView {
       this.updateData({destination: value});
       this._callbacks.destinationChange(this._data);
     }
-
-  }
-
-  _priceInputHandler(evt) {
-    evt.preventDefault();
-    const {value: price} = evt.target;
-
-    this.updateData({price: parseInt(price)}, false);
-  }
-
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-
-    if (!isOnline()) {
-      this.shake(() => {});
-      showOfflineNotification(this.getElement());
-      return;
-    }
-
-    if (typeof this._callbacks.formSubmit === 'function') {
-      this._callbacks.formSubmit(this._data);
-    }
-  }
-
-  _dateStartChangeHandler([date]) {
-    const payload = {start: date.toISOString()};
-
-    if (this._data.end && (date > new Date(this._data.end))) {
-      payload.end = date.toISOString();
-    }
-
-    this.updateData(payload, false);
-    this.setDatePickers();
-  }
-
-  _dateEndChangeHandler([date]) {
-    this.updateData({
-      end: date.toISOString(),
-    }, false);
-    this.setDatePickers();
   }
 
   _cancelClickHandler(evt) {

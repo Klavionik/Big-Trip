@@ -5,10 +5,9 @@ import {
   createOffersTemplate
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
-import SmartView from './smart-view';
-import flatpickr from 'flatpickr';
 import 'flatpickr/dist/flatpickr.min.css';
-import {isOnline, showOfflineNotification} from '../utils/common';
+import {isOnline} from '../utils/common';
+import BaseEvent from './base-event';
 
 const createEventEditFormTemplate = (
   event,
@@ -89,31 +88,14 @@ const createEventEditFormTemplate = (
               </form>`;
 };
 
-class EventEditForm extends SmartView {
+class EventEditForm extends BaseEvent {
   constructor(event, availableOffers = [], availableDestinations) {
-    super({...event});
-
-    this._availableOffers = availableOffers;
-    this._availableDestinations = availableDestinations;
-    this._datePickerStart = null;
-    this._datePickerEnd = null;
-
-    this._isDisabled = false;
-    this._isSaving = false;
+    super({...event}, availableOffers, availableDestinations);
     this._isDeleting = false;
 
-    this._rollupClickHandler = this._rollupClickHandler.bind(this);
-    this._eventTypeClickHandler = this._eventTypeClickHandler.bind(this);
-    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
-    this._eventOfferClickHandler = this._eventOfferClickHandler.bind(this);
-    this._dateStartChangeHandler = this._dateStartChangeHandler.bind(this);
-    this._dateEndChangeHandler = this._dateEndChangeHandler.bind(this);
-    this._priceInputHandler = this._priceInputHandler.bind(this);
-
-    this._formSubmitHandler = this._formSubmitHandler.bind(this);
     this._deleteClickHandler = this._deleteClickHandler.bind(this);
-
-    this._setInnerHandlers();
+    this._rollupClickHandler = this._rollupClickHandler.bind(this);
+    this._destinationChangeHandler = this._destinationChangeHandler.bind(this);
   }
 
   getTemplate() {
@@ -137,16 +119,6 @@ class EventEditForm extends SmartView {
     this.setDestinationChangeHandler(this._callbacks.destinationChange);
   }
 
-  reset(event) {
-    this.updateData(event);
-  }
-
-  setSaving() {
-    this._isSaving = true;
-    this._isDisabled = true;
-    this.updateElement();
-  }
-
   setDeleting() {
     this._isDeleting = true;
     this._isDisabled = true;
@@ -161,6 +133,7 @@ class EventEditForm extends SmartView {
       this.updateElement();
     };
 
+    this._showOfflineNotification();
     this.shake(cb);
   }
 
@@ -169,9 +142,9 @@ class EventEditForm extends SmartView {
     this.getElement().querySelector('.event__rollup-btn').addEventListener('click', this._rollupClickHandler);
   }
 
-  setFormSubmitHandler(cb) {
-    this._callbacks.formSubmit = cb;
-    this.getElement().addEventListener('submit', this._formSubmitHandler);
+  setDeleteClickHandler(cb) {
+    this._callbacks.deleteClick = cb;
+    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteClickHandler);
   }
 
   setDestinationChangeHandler(cb) {
@@ -180,107 +153,10 @@ class EventEditForm extends SmartView {
     element.addEventListener('change', this._destinationChangeHandler);
   }
 
-  destroyDatePickers() {
-    if (this._datePickerStart) {
-      this._datePickerStart.destroy();
-      this._datePickerStart = null;
-    }
-
-    if (this._datePickerEnd) {
-      this._datePickerEnd.destroy();
-      this._datePickerEnd = null;
-    }
-  }
-
-  setDatePickers() {
-    this.destroyDatePickers();
-    this._datePickerStart = this._createDatePicker('#event-start-time-1', this._dateStartChangeHandler);
-    this._datePickerEnd = this._createDatePicker(
-      '#event-end-time-1',
-      this._dateEndChangeHandler,
-      {
-        minDate: formatInputDate(this._data.start),
-        defaultDate: this._data.end,
-      },
-    );
-  }
-
-  setDeleteClickHandler(cb) {
-    this._callbacks.deleteClick = cb;
-    this.getElement().querySelector('.event__reset-btn').addEventListener('click', this._deleteClickHandler);
-  }
-
-  _getOffersForEventType() {
-    const eventTypeOffers = this._availableOffers.find(((offer) => offer.type === this._data.type));
-
-    if (eventTypeOffers) {
-      return [...eventTypeOffers.offers];
-    }
-
-    return [];
-  }
-
-  _setEventTypeClickHandler() {
-    const eventTypeElements = this.getElement().querySelectorAll('.event__type-item');
-
-    eventTypeElements.forEach((element) => {
-      element.addEventListener('change', this._eventTypeClickHandler);
-    });
-  }
-
-  _setPriceInputHandler() {
-    const priceInputElement = this.getElement().querySelector('.event__input--price');
-    priceInputElement.addEventListener('input', this._priceInputHandler);
-  }
-
-  _setEventOfferClickHandler() {
-    const elements = this.getElement().querySelectorAll('.event__offer-checkbox');
-
-    elements.forEach((element) => {
-      element.addEventListener('click', this._eventOfferClickHandler);
-    });
-  }
-
-  _createDatePicker(selector, onChangeHandler, options) {
-    return flatpickr(
-      this.getElement().querySelector(selector),
-      {
-        enableTime: true,
-        dateFormat: 'd/m/y H:i',
-        onChange: onChangeHandler,
-        ...options,
-      },
-    );
-  }
-
   _setInnerHandlers() {
     this._setEventTypeClickHandler();
     this._setEventOfferClickHandler();
     this._setPriceInputHandler();
-  }
-
-  _eventTypeClickHandler(evt) {
-    evt.preventDefault();
-    this.updateData({type: evt.target.value, offers: []});
-  }
-
-  _eventOfferClickHandler(evt) {
-    evt.preventDefault();
-
-    const label = evt.target.parentElement.querySelector('label');
-    const title = label.children[0].textContent;
-    const price  = parseInt(label.children[1].textContent);
-
-    const offer = {title, price};
-    let offers;
-
-    if (this._data.offers.every((value) => value.title !== title)) {
-      offers = [...this._data.offers, offer];
-    } else {
-      offers = this._data.offers.filter((value) => value.title !== title);
-    }
-
-    this.updateData({offers});
   }
 
   _destinationChangeHandler(evt) {
@@ -297,14 +173,6 @@ class EventEditForm extends SmartView {
     if (typeof this._callbacks.destinationChange === 'function') {
       this._callbacks.destinationChange({destination: value});
     }
-
-  }
-
-  _priceInputHandler(evt) {
-    evt.preventDefault();
-    const {value: price} = evt.target;
-
-    this.updateData({price: parseInt(price)}, false);
   }
 
   _rollupClickHandler(evt) {
@@ -315,44 +183,12 @@ class EventEditForm extends SmartView {
     }
   }
 
-  _formSubmitHandler(evt) {
-    evt.preventDefault();
-
-    if (!isOnline()) {
-      this.shake(() => {});
-      showOfflineNotification(this.getElement());
-      return;
-    }
-
-    if (typeof this._callbacks.formSubmit === 'function') {
-      this._callbacks.formSubmit(this._data);
-    }
-  }
-
-  _dateStartChangeHandler([date]) {
-    const payload = {start: date.toISOString()};
-
-    if (date > new Date(this._data.end)) {
-      payload.end = date.toISOString();
-    }
-
-    this.updateData(payload, false);
-    this.setDatePickers();
-  }
-
-  _dateEndChangeHandler([date]) {
-    this.updateData({
-      end: date.toISOString(),
-    }, false);
-    this.setDatePickers();
-  }
-
   _deleteClickHandler(evt) {
     evt.preventDefault();
 
     if (!isOnline()) {
       this.shake(() => {});
-      showOfflineNotification(this.getElement());
+      this._showOfflineNotification();
       return;
     }
 
