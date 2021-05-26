@@ -2,6 +2,9 @@ const API_URL = 'https://14.ecmascript.pages.academy/big-trip';
 const TOKEN = 'KKgcBbinvjI';
 const ERROR_ATTR = 'data-error';
 const ERROR_MSG = 'Loading failed, try reloading the page';
+const STORE_PREFIX = 'bigtrip-storage';
+const STORE_VER = 'v1';
+const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const TYPES = [
   'taxi',
@@ -64,6 +67,12 @@ const Mode = {
   EDIT: 'EDIT',
 };
 
+const RenderPosition = {
+  AFTERBEGIN: 'afterbegin',
+  BEFOREEND: 'beforeend',
+  AFTEREND: 'afterend',
+};
+
 
 export {
   TYPES,
@@ -78,5 +87,7 @@ export {
   ERROR_ATTR,
   ERROR_MSG,
   State,
-  Mode
+  Mode,
+  STORE_NAME,
+  RenderPosition
 };

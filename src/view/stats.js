@@ -33,6 +33,8 @@ const _getChartOptions = ({text, labels, data, formatter}) => {
         backgroundColor: '#ffffff',
         hoverBackgroundColor: '#ffffff',
         anchor: 'start',
+        barThickness: 44,
+        minBarLength: 50,
       }],
     },
     options: {
@@ -65,7 +67,6 @@ const _getChartOptions = ({text, labels, data, formatter}) => {
             display: false,
             drawBorder: false,
           },
-          barThickness: 44,
         }],
         xAxes: [{
           ticks: {
@@ -76,7 +77,6 @@ const _getChartOptions = ({text, labels, data, formatter}) => {
             display: false,
             drawBorder: false,
           },
-          minBarLength: 50,
         }],
       },
       legend: {
@@ -105,6 +105,21 @@ class Stats extends AbstractView {
 
   getTemplate() {
     return createStatsTemplate();
+  }
+
+  hide() {
+    super.hide();
+    this._destroy();
+  }
+
+  draw({moneyStats, typeStats, timeSpendStats}) {
+    // количество лейблов будет одинаковым в любом объекте, берем первый
+    const labelsCount = Object.keys(moneyStats).length;
+    this._setCtxHeight(labelsCount);
+
+    this._drawMoneyStats(this._prepareData(moneyStats));
+    this._drawTypeStats(this._prepareData(typeStats));
+    this._drawTimeSpendStats(this._prepareData(timeSpendStats));
   }
 
   _drawMoneyStats({labels, data}) {
@@ -148,11 +163,6 @@ class Stats extends AbstractView {
     this._timeSpendCtx.height = this._BAR_HEIGHT * labelsCount;
   }
 
-  hide() {
-    super.hide();
-    this._destroy();
-  }
-
   _destroy() {
     if (this._timeSpendChart) {
       this._timeSpendChart.destroy();
@@ -165,16 +175,6 @@ class Stats extends AbstractView {
     if (this._moneyChart) {
       this._moneyChart.destroy();
     }
-  }
-
-  draw({moneyStats, typeStats, timeSpendStats}) {
-    // количество лейблов будет одинаковым в любом объекте, берем первый
-    const labelsCount = Object.keys(moneyStats).length;
-    this._setCtxHeight(labelsCount);
-
-    this._drawMoneyStats(this._prepareData(moneyStats));
-    this._drawTypeStats(this._prepareData(typeStats));
-    this._drawTimeSpendStats(this._prepareData(timeSpendStats));
   }
 }
 

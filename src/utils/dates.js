@@ -2,25 +2,25 @@ import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
 import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
-dayjs.extend(duration);
-dayjs.extend(isSameOrAfter);
-
 const HOUR_IN_MS = 3600000;
 const DAY_IN_MS = HOUR_IN_MS * 24;
 
-const formatDuration = (duration) => {
-  const durationObj = dayjs.duration(duration);
+dayjs.extend(duration);
+dayjs.extend(isSameOrAfter);
 
-  if (duration < HOUR_IN_MS) {
-    return durationObj.format('mm[M]');
+const formatDuration = (durationMs) => {
+  const duration = dayjs.duration(durationMs);
+
+  if (durationMs < HOUR_IN_MS) {
+    return duration.format('mm[M]');
   }
 
-  if (duration >= HOUR_IN_MS && duration < DAY_IN_MS) {
-    return durationObj.format('HH[H] mm[M]');
+  if (durationMs >= HOUR_IN_MS && durationMs < DAY_IN_MS) {
+    return duration.format('HH[H] mm[M]');
   }
 
-  if (duration >= DAY_IN_MS) {
-    return durationObj.format('DD[D] HH[H] mm[M]');
+  if (durationMs >= DAY_IN_MS) {
+    return duration.format('DD[D] HH[H] mm[M]');
   }
 };
 

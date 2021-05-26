@@ -29,19 +29,19 @@ class Menu extends AbstractView {
     });
   }
 
+  setMenuItemClickHandler(cb) {
+    this._callbacks.menuItemClick = cb;
+
+    const elements = this.getElement().querySelectorAll('a');
+    elements.forEach((element) => element.addEventListener('click', this._handleMenuItemClick));
+  }
+
   _handleMenuItemClick(evt) {
     evt.preventDefault();
 
     if (typeof this._callbacks.menuItemClick === 'function') {
       this._callbacks.menuItemClick(evt.target);
     }
-  }
-
-  setMenuItemClickHandler(cb) {
-    this._callbacks.menuItemClick = cb;
-
-    const elements = this.getElement().querySelectorAll('a');
-    elements.forEach((element) => element.addEventListener('click', this._handleMenuItemClick));
   }
 }
 

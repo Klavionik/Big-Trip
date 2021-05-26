@@ -1,5 +1,6 @@
 import {processEventDate} from '../utils/dates';
 import AbstractView from './abstract-view';
+import {isOnline} from '../utils/common';
 
 const createOffersTemplate = (offers) => {
   const createOffers = () => {
@@ -75,22 +76,6 @@ class EventItem extends AbstractView {
     return createEventItemTemplate(this._event);
   }
 
-  _rollupClickHandler(evt) {
-    evt.preventDefault();
-
-    if (typeof this._callbacks.rollupClick === 'function') {
-      this._callbacks.rollupClick();
-    }
-  }
-
-  _isFavoriteClickHandler(evt) {
-    evt.preventDefault();
-
-    if (typeof this._callbacks.isFavoriteClick === 'function') {
-      this._callbacks.isFavoriteClick();
-    }
-  }
-
   setAborted() {
     this.shake(() => {});
   }
@@ -103,6 +88,26 @@ class EventItem extends AbstractView {
   setIsFavoriteClickHandler(cb) {
     this._callbacks.isFavoriteClick = cb;
     this.getElement().querySelector('.event__favorite-btn').addEventListener('click', this._isFavoriteClickHandler);
+  }
+
+  _rollupClickHandler(evt) {
+    evt.preventDefault();
+
+    if (!isOnline()) {
+      return;
+    }
+
+    if (typeof this._callbacks.rollupClick === 'function') {
+      this._callbacks.rollupClick();
+    }
+  }
+
+  _isFavoriteClickHandler(evt) {
+    evt.preventDefault();
+
+    if (typeof this._callbacks.isFavoriteClick === 'function') {
+      this._callbacks.isFavoriteClick();
+    }
   }
 }
 

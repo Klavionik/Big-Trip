@@ -33,18 +33,6 @@ class Filters {
     replace(previousFilterComponent, this._filtersComponent);
   }
 
-  _handleModelEvent() {
-    this.initialize();
-  }
-
-  _handleFilterTypeChange(filterType) {
-    if (this._filtersModel.getFilter() === filterType) {
-      return;
-    }
-
-    this._filtersModel.setFilter(RedrawScope.PAGE, filterType);
-  }
-
   _getFilters() {
     const events = this._eventsModel.getEvents();
 
@@ -65,6 +53,18 @@ class Filters {
         count: filters[FilterType.PAST](events).length,
       },
     ];
+  }
+
+  _handleModelEvent() {
+    this.initialize();
+  }
+
+  _handleFilterTypeChange(filterType) {
+    if (this._filtersModel.getFilter() === filterType) {
+      return;
+    }
+
+    this._filtersModel.setFilter(RedrawScope.PAGE, filterType);
   }
 }
 

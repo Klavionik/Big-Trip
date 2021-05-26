@@ -1,4 +1,5 @@
 import AbstractView from '../view/abstract-view';
+import {ERROR_ATTR, ERROR_MSG} from '../const';
 
 const createElement = (html) => {
   const container = document.createElement('template');
@@ -34,4 +35,13 @@ const remove = (component) => {
   component.removeElement();
 };
 
-export {createElement, render, replace, remove};
+const isOnline = () => {
+  return navigator.onLine;
+};
+
+const setErrorOverlay = () => {
+  document.body.setAttribute(ERROR_ATTR, ERROR_MSG);
+  document.body.classList.add('error-overlay');
+};
+
+export {createElement, render, replace, remove, isOnline, setErrorOverlay};

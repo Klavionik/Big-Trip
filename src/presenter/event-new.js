@@ -1,5 +1,5 @@
 import {remove, render} from '../utils/common';
-import {ActionType, RedrawScope} from '../const';
+import {ActionType, RedrawScope, RenderPosition} from '../const';
 import EventNewForm from '../view/event-new-form';
 import {now} from '../utils/dates';
 
@@ -13,7 +13,7 @@ class EventNew {
     this._eventNewForm = null;
     this._cancelCallback = null;
 
-    this._closeOnEscape = this._closeOnEscape.bind(this);
+    this._handleKeyDown = this._handleKeyDown.bind(this);
     this._handleSubmit = this._handleSubmit.bind(this);
     this._handleCancel = this._handleCancel.bind(this);
     this._handleDestinationChange = this._handleDestinationChange.bind(this);
@@ -32,9 +32,9 @@ class EventNew {
     this._eventNewForm = new EventNewForm(event, availableOffers, availableDestinations);
     this._setEventNewFormHandlers();
 
-    render(this._eventList, this._eventNewForm, 'afterbegin');
+    render(this._eventList, this._eventNewForm, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener('keydown', this._closeOnEscape);
+    document.addEventListener('keydown', this._handleKeyDown);
   }
 
   destroy() {
@@ -50,7 +50,7 @@ class EventNew {
     this._eventNewForm.destroyDatepickers();
     this._eventNewForm = null;
 
-    document.removeEventListener('keydown', this._closeOnEscape);
+    document.removeEventListener('keydown', this._handleKeyDown);
   }
 
   setViewSaving() {
@@ -74,7 +74,7 @@ class EventNew {
   }
 
   _setEventNewFormHandlers() {
-    this._eventNewForm.setSubmitHandler(this._handleSubmit);
+    this._eventNewForm.setFormSubmitHandler(this._handleSubmit);
     this._eventNewForm.setCancelClickHandler(this._handleCancel);
     this._eventNewForm.setDestinationChangeHandler(this._handleDestinationChange);
   }
@@ -84,7 +84,7 @@ class EventNew {
     this._eventNewForm.updateData({...data, description: description});
   }
 
-  _closeOnEscape(evt) {
+  _handleKeyDown(evt) {
     if (evt.code === 'Escape') {
       evt.preventDefault();
       this.destroy();

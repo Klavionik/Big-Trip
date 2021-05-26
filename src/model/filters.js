@@ -7,13 +7,13 @@ class Filters extends Observer {
     this._activeFilter = FilterType.EVERYTHING;
   }
 
+  getFilter() {
+    return this._activeFilter;
+  }
+
   setFilter(redrawScope, filter) {
     this._activeFilter = filter;
     this._notify(redrawScope, filter);
-  }
-
-  getFilter() {
-    return this._activeFilter;
   }
 }
 
