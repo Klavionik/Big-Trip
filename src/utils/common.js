@@ -1,6 +1,8 @@
 import AbstractView from '../view/abstract-view';
 import {ERROR_ATTR, ERROR_MSG, RenderPosition} from '../const';
 
+const REMOVE_DELAY = 3000;
+
 const createElement = (html) => {
   const container = document.createElement('template');
   container.innerHTML = html;
@@ -52,7 +54,7 @@ const showOfflineNotification = (parent) => {
 
   render(parent, notification, RenderPosition.BEFOREBEGIN);
 
-  setTimeout(() => notification.remove(), 3000);
+  setTimeout(() => notification.remove(), REMOVE_DELAY);
 };
 
 export {createElement, render, replace, remove, isOnline, setErrorOverlay, showOfflineNotification};

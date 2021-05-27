@@ -75,9 +75,20 @@ const createEventTypesTemplate = (currentType) => {
   }).join('');
 };
 
+const createPhotosTemplate = (description) => {
+  const addPhoto = (photo) => `<img class="event__photo" src="${photo.src}" alt="${photo.description}">`;
+
+  return description
+    ? `<div class="event__photos-container">
+         <div class="event__photos-tape">${description.photos.map(addPhoto).join('')}</div>
+       </div>`
+    : '';
+};
+
 export {
   createEventTypesTemplate,
   createDestinationListTemplate,
   createOffersTemplate,
-  createDescriptionTemplate
+  createDescriptionTemplate,
+  createPhotosTemplate
 };
