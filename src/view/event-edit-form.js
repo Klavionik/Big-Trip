@@ -2,7 +2,7 @@ import {
   createDescriptionTemplate,
   createDestinationListTemplate,
   createEventTypesTemplate,
-  createOffersTemplate
+  createOffersTemplate, createPhotosTemplate
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
 import 'flatpickr/dist/flatpickr.min.css';
@@ -84,6 +84,7 @@ const createEventEditFormTemplate = (
                 <section class="event__details">
                     ${createOffersTemplate(offers, eventTypeOffers, disabled)}
                     ${createDescriptionTemplate(description)}
+                    ${createPhotosTemplate(description)}
                 </section>
               </form>`;
 };
