@@ -208,17 +208,17 @@ class Trip {
     switch (actionType) {
       case ActionType.ADD:
         this._eventNewPresenter.setViewSaving();
-        this._api.createEvent(EventsModel.convertToServer(data))
-          .then(EventsModel.convertFromServer)
+        this._api.createEvent(EventsModel.convertToServer(this._destinationsModel)(data))
+          .then(EventsModel.convertFromServer(this._destinationsModel, this._offersModel))
           .then((data) => this._eventsModel.addItem(redrawScope, data))
           .catch(() => this._eventNewPresenter.setViewAborted());
         break;
       case ActionType.UPDATE:
         this._eventPresenters[data.id].setViewState(State.SAVING);
-        this._api.updateEvent(EventsModel.convertToServer(data))
-          .then(EventsModel.convertFromServer)
+        this._api.updateEvent(EventsModel.convertToServer(this._destinationsModel)(data))
+          .then(EventsModel.convertFromServer(this._destinationsModel, this._offersModel))
           .then((data) => this._eventsModel.updateItem(redrawScope, data))
-          .catch(() =>  this._eventPresenters[data.id].setViewState(State.ABORTED));
+          .catch(() => this._eventPresenters[data.id].setViewState(State.ABORTED));
         break;
       case ActionType.DELETE:
         this._eventPresenters[data.id].setViewState(State.DELETING);

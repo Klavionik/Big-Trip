@@ -2,7 +2,8 @@ import {
   createDescriptionTemplate,
   createDestinationListTemplate,
   createEventTypesTemplate,
-  createOffersTemplate, createPhotosTemplate
+  createOffersTemplate,
+  createPhotosTemplate
 } from '../utils/event-items';
 import {formatInputDate} from '../utils/dates';
 import 'flatpickr/dist/flatpickr.min.css';

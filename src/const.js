@@ -1,4 +1,4 @@
-const API_URL = 'https://14.ecmascript.pages.academy/big-trip';
+const API_URL = 'https://19.ecmascript.pages.academy/big-trip';
 const TOKEN = 'KKgcBbinvjI';
 const ERROR_ATTR = 'data-error';
 const ERROR_MSG = 'Loading failed, try reloading the page';

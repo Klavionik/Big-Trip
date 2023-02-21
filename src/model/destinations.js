@@ -7,6 +7,10 @@ class Destinations extends Observer {
   }
 
   getItems() {
+    return [...this._destinations];
+  }
+
+  getDestinations() {
     return this._destinations.map((destination) => destination.destination);
   }
 
@@ -21,6 +25,7 @@ class Destinations extends Observer {
 
   static convertFromServer(destination) {
     return {
+      id: destination.id,
       destination: destination.name,
       description: {
         text: destination.description,

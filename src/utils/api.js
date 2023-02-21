@@ -16,7 +16,7 @@ const loadData = async (provider, offersModel, destinationsModel, eventsModel, c
 
   try {
     const events = await provider.getEvents();
-    eventsModel.setItems(RedrawScope.INIT, events.map(EventsModel.convertFromServer));
+    eventsModel.setItems(RedrawScope.INIT, events.map(EventsModel.convertFromServer(destinationsModel, offersModel)));
   } catch (error) {
     const events = [];
     eventsModel.setItems(RedrawScope.INIT, events);

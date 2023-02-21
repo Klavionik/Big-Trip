@@ -42,45 +42,54 @@ class Events extends Observer {
     }
   }
 
-  static convertFromServer(event) {
-    const {offers, destination} = event;
+  static convertFromServer(destinationsModel, offersModel) {
+    const destinations = destinationsModel.getItems();
+    const offers = offersModel.getItems();
 
-    return {
-      id: event.id,
-      type: event.type,
-      destination: destination.name,
-      description: {
-        text: destination.description,
-        photos: destination.pictures,
-      },
-      start: event['date_from'],
-      end: event['date_to'],
-      price: event['base_price'],
-      offers: offers,
-      isFavorite: event['is_favorite'],
+    return function(event) {
+      const eventDestination = destinations.find((destination) => destination.id === event.destination);
+      const typeOffers = offers.find((offer) => offer.type === event.type);
+      const eventOffers = event.offers.map((offerId) => typeOffers.offers.find(({id}) => offerId === id));
+
+      return {
+        id: event.id,
+        type: event.type,
+        destination: eventDestination.destination,
+        description: {
+          text: eventDestination.description.text,
+          photos: eventDestination.description.photos,
+        },
+        start: event['date_from'],
+        end: event['date_to'],
+        price: event['base_price'],
+        offers: eventOffers,
+        isFavorite: event['is_favorite'],
+      };
     };
   }
 
-  static convertToServer(event) {
-    const convertedEvent = {
-      type: event.type,
-      destination: {
-        name: event.destination,
-        description: event.description.text,
-        pictures: event.description.photos,
-      },
-      'date_from': event.start,
-      'date_to': event.end,
-      'base_price': event.price,
-      offers: event.offers,
-      'is_favorite': event.isFavorite,
+  static convertToServer(destinationsModel) {
+    const destinations = destinationsModel.getItems();
+
+    return function(event) {
+      const eventDestination = destinations.find((destination) => destination.destination === event.destination);
+
+      const convertedEvent = {
+        type: event.type,
+        destination: eventDestination.id,
+        'date_from': event.start,
+        'date_to': event.end,
+        'base_price': event.price,
+        offers: event.offers.map(({id}) => id),
+        'is_favorite': event.isFavorite,
+      };
+
+      if (event.id) {
+        convertedEvent.id = event.id;
+      }
+
+      return convertedEvent;
     };
-
-    if (event.id) {
-      convertedEvent.id = event.id;
-    }
-
-    return convertedEvent;
   }
 }
 

@@ -27,7 +27,7 @@ class EventNew {
     }
 
     const availableOffers = this._offersModel.getItems();
-    const availableDestinations = this._destinationsModel.getItems();
+    const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventNewForm = new EventNewForm(event, availableOffers, availableDestinations);
     this._setEventNewFormHandlers();

@@ -122,10 +122,11 @@ class BaseEvent extends SmartView {
     evt.preventDefault();
 
     const label = evt.target.parentElement.querySelector('label');
+    const id = parseInt(evt.target.id.split('_')[1]);
     const title = label.children[0].textContent;
-    const price  = parseInt(label.children[1].textContent);
+    const price = parseInt(label.children[1].textContent);
 
-    const offer = {title, price};
+    const offer = {id, title, price};
     let offers;
 
     if (this._data.offers.every((value) => value.title !== title)) {

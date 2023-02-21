@@ -34,7 +34,7 @@ class Event {
     const previousEventEditForm = this._eventEditForm;
 
     const offers = this._offersModel.getItems();
-    const availableDestinations = this._destinationsModel.getItems();
+    const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventItem = new EventItem(event);
     this._eventEditForm = new EventEditForm(event, offers, availableDestinations);
