@@ -42711,7 +42711,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "Mode", function() { return Mode; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "STORE_NAME", function() { return STORE_NAME; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "RenderPosition", function() { return RenderPosition; });
-const API_URL = 'https://14.ecmascript.pages.academy/big-trip';
+const API_URL = 'https://19.ecmascript.pages.academy/big-trip';
 const TOKEN = 'KKgcBbinvjI';
 const ERROR_ATTR = 'data-error';
 const ERROR_MSG = 'Loading failed, try reloading the page';
@@ -42946,6 +42946,10 @@ class Destinations extends _utils_observer__WEBPACK_IMPORTED_MODULE_0__["default
   }
 
   getItems() {
+    return [...this._destinations];
+  }
+
+  getDestinations() {
     return this._destinations.map((destination) => destination.destination);
   }
 
@@ -42960,6 +42964,7 @@ class Destinations extends _utils_observer__WEBPACK_IMPORTED_MODULE_0__["default
 
   static convertFromServer(destination) {
     return {
+      id: destination.id,
       destination: destination.name,
       description: {
         text: destination.description,
@@ -43037,45 +43042,54 @@ class Events extends _utils_observer__WEBPACK_IMPORTED_MODULE_0__["default"] {
     }
   }
 
-  static convertFromServer(event) {
-    const {offers, destination} = event;
+  static convertFromServer(destinationsModel, offersModel) {
+    const destinations = destinationsModel.getItems();
+    const offers = offersModel.getItems();
 
-    return {
-      id: event.id,
-      type: event.type,
-      destination: destination.name,
-      description: {
-        text: destination.description,
-        photos: destination.pictures,
-      },
-      start: event['date_from'],
-      end: event['date_to'],
-      price: event['base_price'],
-      offers: offers,
-      isFavorite: event['is_favorite'],
+    return function(event) {
+      const eventDestination = destinations.find((destination) => destination.id === event.destination);
+      const typeOffers = offers.find((offer) => offer.type === event.type);
+      const eventOffers = event.offers.map((offerId) => typeOffers.offers.find(({id}) => offerId === id));
+
+      return {
+        id: event.id,
+        type: event.type,
+        destination: eventDestination.destination,
+        description: {
+          text: eventDestination.description.text,
+          photos: eventDestination.description.photos,
+        },
+        start: event['date_from'],
+        end: event['date_to'],
+        price: event['base_price'],
+        offers: eventOffers,
+        isFavorite: event['is_favorite'],
+      };
     };
   }
 
-  static convertToServer(event) {
-    const convertedEvent = {
-      type: event.type,
-      destination: {
-        name: event.destination,
-        description: event.description.text,
-        pictures: event.description.photos,
-      },
-      'date_from': event.start,
-      'date_to': event.end,
-      'base_price': event.price,
-      offers: event.offers,
-      'is_favorite': event.isFavorite,
+  static convertToServer(destinationsModel) {
+    const destinations = destinationsModel.getItems();
+
+    return function(event) {
+      const eventDestination = destinations.find((destination) => destination.destination === event.destination);
+
+      const convertedEvent = {
+        type: event.type,
+        destination: eventDestination.id,
+        'date_from': event.start,
+        'date_to': event.end,
+        'base_price': event.price,
+        offers: event.offers.map(({id}) => id),
+        'is_favorite': event.isFavorite,
+      };
+
+      if (event.id) {
+        convertedEvent.id = event.id;
+      }
+
+      return convertedEvent;
     };
-
-    if (event.id) {
-      convertedEvent.id = event.id;
-    }
-
-    return convertedEvent;
   }
 }
 
@@ -43194,7 +43208,7 @@ class EventNew {
     }
 
     const availableOffers = this._offersModel.getItems();
-    const availableDestinations = this._destinationsModel.getItems();
+    const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventNewForm = new _view_event_new_form__WEBPACK_IMPORTED_MODULE_2__["default"](event, availableOffers, availableDestinations);
     this._setEventNewFormHandlers();
@@ -43326,7 +43340,7 @@ class Event {
     const previousEventEditForm = this._eventEditForm;
 
     const offers = this._offersModel.getItems();
-    const availableDestinations = this._destinationsModel.getItems();
+    const availableDestinations = this._destinationsModel.getDestinations();
 
     this._eventItem = new _view_event_item__WEBPACK_IMPORTED_MODULE_0__["default"](event);
     this._eventEditForm = new _view_event_edit_form__WEBPACK_IMPORTED_MODULE_1__["default"](event, offers, availableDestinations);
@@ -43773,17 +43787,17 @@ class Trip {
     switch (actionType) {
       case _const__WEBPACK_IMPORTED_MODULE_8__["ActionType"].ADD:
         this._eventNewPresenter.setViewSaving();
-        this._api.createEvent(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertToServer(data))
-          .then(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertFromServer)
+        this._api.createEvent(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertToServer(this._destinationsModel)(data))
+          .then(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertFromServer(this._destinationsModel, this._offersModel))
           .then((data) => this._eventsModel.addItem(redrawScope, data))
           .catch(() => this._eventNewPresenter.setViewAborted());
         break;
       case _const__WEBPACK_IMPORTED_MODULE_8__["ActionType"].UPDATE:
         this._eventPresenters[data.id].setViewState(_const__WEBPACK_IMPORTED_MODULE_8__["State"].SAVING);
-        this._api.updateEvent(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertToServer(data))
-          .then(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertFromServer)
+        this._api.updateEvent(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertToServer(this._destinationsModel)(data))
+          .then(_model_events__WEBPACK_IMPORTED_MODULE_13__["default"].convertFromServer(this._destinationsModel, this._offersModel))
           .then((data) => this._eventsModel.updateItem(redrawScope, data))
-          .catch(() =>  this._eventPresenters[data.id].setViewState(_const__WEBPACK_IMPORTED_MODULE_8__["State"].ABORTED));
+          .catch(() => this._eventPresenters[data.id].setViewState(_const__WEBPACK_IMPORTED_MODULE_8__["State"].ABORTED));
         break;
       case _const__WEBPACK_IMPORTED_MODULE_8__["ActionType"].DELETE:
         this._eventPresenters[data.id].setViewState(_const__WEBPACK_IMPORTED_MODULE_8__["State"].DELETING);
@@ -43852,7 +43866,7 @@ const loadData = async (provider, offersModel, destinationsModel, eventsModel, c
 
   try {
     const events = await provider.getEvents();
-    eventsModel.setItems(_const__WEBPACK_IMPORTED_MODULE_2__["RedrawScope"].INIT, events.map(_model_events__WEBPACK_IMPORTED_MODULE_3__["default"].convertFromServer));
+    eventsModel.setItems(_const__WEBPACK_IMPORTED_MODULE_2__["RedrawScope"].INIT, events.map(_model_events__WEBPACK_IMPORTED_MODULE_3__["default"].convertFromServer(destinationsModel, offersModel)));
   } catch (error) {
     const events = [];
     eventsModel.setItems(_const__WEBPACK_IMPORTED_MODULE_2__["RedrawScope"].INIT, events);
@@ -44149,11 +44163,11 @@ const createDescriptionTemplate = (description) => {
 
 const createOffersTemplate = (eventOffers, eventTypeOffers, disabled) => {
   const addOffers = (offers) => {
-    return offers.map(({title, price, checked}) => {
+    return offers.map(({id, title, price, checked}) => {
       const name = generateInputNameFromTitle(title);
       return `<div class="event__offer-selector">
-              <input class="event__offer-checkbox  visually-hidden" id="${name}-1" type="checkbox" name="${name}" ${checked ? 'checked' : ''} ${disabled}>
-              <label class="event__offer-label" for="${name}-1">
+              <input class="event__offer-checkbox  visually-hidden" id="${name}_${id}" type="checkbox" name="${name}" ${checked ? 'checked' : ''} ${disabled}>
+              <label class="event__offer-label" for="${name}_${id}">
                 <span class="event__offer-title">${title}</span>
                 &plus;&euro;&nbsp;
                 <span class="event__offer-price">${price}</span>
@@ -44533,10 +44547,11 @@ class BaseEvent extends _smart_view__WEBPACK_IMPORTED_MODULE_0__["default"] {
     evt.preventDefault();
 
     const label = evt.target.parentElement.querySelector('label');
+    const id = parseInt(evt.target.id.split('_')[1]);
     const title = label.children[0].textContent;
-    const price  = parseInt(label.children[1].textContent);
+    const price = parseInt(label.children[1].textContent);
 
-    const offer = {title, price};
+    const offer = {id, title, price};
     let offers;
 
     if (this._data.offers.every((value) => value.title !== title)) {
