@@ -1,9 +1,8 @@
 import {HttpMethod} from '../const';
 
 class API {
-  constructor(baseUrl, token) {
+  constructor(baseUrl) {
     this._baseUrl = baseUrl;
-    this._token = token;
   }
 
   getEvents() {
@@ -44,8 +43,6 @@ class API {
 
   _makeHeaders({json = false}) {
     const headers = new Headers();
-    const auth = `Basic ${this._token}`;
-    headers.append('Authorization', auth);
 
     if (json) {
       headers.append('Content-Type', 'application/json');

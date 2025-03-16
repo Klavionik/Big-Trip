@@ -1,5 +1,4 @@
-const API_URL = 'https://21.objects.htmlacademy.pro/big-trip';
-const TOKEN = 'KKgcBbinvjI';
+const API_URL = 'http://localhost:8000/api/v1';
 const ERROR_ATTR = 'data-error';
 const ERROR_MSG = 'Loading failed, try reloading the page';
 const STORE_PREFIX = 'bigtrip-storage';
@@ -84,7 +83,6 @@ export {
   MenuItem,
   HttpMethod,
   API_URL,
-  TOKEN,
   ERROR_ATTR,
   ERROR_MSG,
   State,

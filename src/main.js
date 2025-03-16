@@ -7,7 +7,7 @@ import FiltersModel from './model/filters';
 import FiltersPresenter from './presenter/filters';
 import OffersModel from './model/offers';
 import DestinationsModel from './model/destinations';
-import {MenuItem, API_URL, TOKEN, STORE_NAME, RenderPosition} from './const';
+import {MenuItem, API_URL, STORE_NAME, RenderPosition} from './const';
 import API from './api/api';
 import Provider from './api/provider';
 import Store from './api/store';
@@ -20,7 +20,7 @@ const filtersElement = document.querySelector('.trip-controls__filters');
 const tripMainElement = document.querySelector('.trip-main');
 const tripEventsElement = document.querySelector('.trip-events');
 
-const provider = new Provider(new API(API_URL, TOKEN), new Store(STORE_NAME, localStorage));
+const provider = new Provider(new API(API_URL), new Store(STORE_NAME, localStorage));
 
 const statsComponent = new StatsView();
 const menuComponent = new MenuView();
