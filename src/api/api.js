@@ -6,23 +6,23 @@ class API {
   }
 
   getEvents() {
-    return this._request(HttpMethod.GET, '/points').then(API.getJSON);
+    return this._request(HttpMethod.GET, '/events').then(API.getJSON);
   }
 
   createEvent(data) {
-    return this._request(HttpMethod.POST, '/points', data).then(API.getJSON);
+    return this._request(HttpMethod.POST, '/events', data).then(API.getJSON);
   }
 
   updateEvent(data) {
-    return this._request(HttpMethod.PUT, `/points/${data.id}`, data).then(API.getJSON);
+    return this._request(HttpMethod.PUT, `/events/${data.id}`, data).then(API.getJSON);
   }
 
   deleteEvent(data) {
-    return this._request(HttpMethod.DELETE, `/points/${data.id}`);
+    return this._request(HttpMethod.DELETE, `/events/${data.id}`);
   }
 
   getOffers() {
-    return this._request(HttpMethod.GET, '/offers').then(API.getJSON);
+    return this._request(HttpMethod.GET, '/activities').then(API.getJSON);
   }
 
   getDestinations() {
@@ -30,7 +30,7 @@ class API {
   }
 
   sync(data) {
-    return this._request(HttpMethod.POST, '/points/sync', data).then(API.getJSON);
+    return this._request(HttpMethod.POST, '/events/sync', data).then(API.getJSON);
   }
 
   _checkStatus(response) {
