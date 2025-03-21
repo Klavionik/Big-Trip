@@ -1,13 +1,5 @@
 import {isOnline} from '../utils/common.js';
 
-const getSyncedEvents = (items) => {
-  return items.map((item) => {
-    if (item.success) {
-      return item.payload.point;
-    }
-  });
-};
-
 const createStoreStructure = (items) => {
   return items.reduce((acc, current) => {
     return {...acc, [current.id]: current};
@@ -84,8 +76,7 @@ class Provider {
 
       return this._api.sync(events)
         .then((response) => {
-          const updatedEvents = getSyncedEvents(response.updated);
-          this._store.setItems(createStoreStructure([...updatedEvents]));
+          this._store.setItems(createStoreStructure([...response.updated]));
           this._needsSync = false;
         });
     }
