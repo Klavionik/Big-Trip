@@ -1,8 +1,8 @@
-const API_URL = 'http://localhost:8000/api/v1';
+const API_URL = 'https://big-trip.klavionik.dev';
 const ERROR_ATTR = 'data-error';
 const ERROR_MSG = 'Loading failed, try reloading the page';
 const STORE_PREFIX = 'bigtrip-storage';
-const STORE_VER = 'v1';
+const STORE_VER = 'v2';
 const STORE_NAME = `${STORE_PREFIX}-${STORE_VER}`;
 
 const TYPES = [
